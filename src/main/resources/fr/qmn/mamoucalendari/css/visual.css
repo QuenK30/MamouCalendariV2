@@ -1,0 +1,35 @@
+@font-face {
+    font-family: 'Ubuntu';
+    src: url('../font/Ubuntu-Bold.ttf');
+}
+#textDate {
+    -fx-text-fill: black;
+    -fx-font-size: 32px;
+    -fx-text-alignment: center;
+    -fx-font-weight: bold;
+
+    -fx-font-family: 'Ubuntu';
+
+    -fx-alignment: center;
+}
+#textHours {
+    -fx-text-fill: black;
+    -fx-font-size: 60px;
+    -fx-text-alignment: center;
+    -fx-font-weight: bold;
+
+    -fx-font-family: 'Ubuntu';
+
+    -fx-alignment: center;
+}
+
+#textCountTasks {
+    -fx-text-fill: black;
+    -fx-font-size: 72px;
+    -fx-text-alignment: center;
+    -fx-font-weight: bold;
+
+    -fx-font-family: 'Ubuntu';
+
+    -fx-alignment: center;
+}
