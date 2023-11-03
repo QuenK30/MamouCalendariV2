@@ -8,6 +8,7 @@ mvnw.cmd
 src/main/resources/fr/qmn/mamoucalendari/bdd/
 src/main/resources/fr/qmn/mamoucalendari/design/
 src/main/resources/fr/qmn/mamoucalendari/ocr/
+MamouCalendariV2.iml
 ### resources ###
 !**/src/main/**/resources/fr/qmn/mamoucalendari/bdd/UserRegistre.db
 !**/src/test/**/resources/fr/qmn/mamoucalendari/css/
