@@ -1,6 +1,9 @@
 module fr.qmn.mamoucalendari {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.desktop;
+    requires javafx.graphics;
+    requires javafx.swing;
     requires org.xerial.sqlitejdbc;
     requires tess4j;
     requires lept4j;

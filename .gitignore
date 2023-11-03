@@ -2,7 +2,12 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-
+pom.xml
+mvnw
+mvnw.cmd
+src/main/resources/fr/qmn/mamoucalendari/bdd/
+src/main/resources/fr/qmn/mamoucalendari/design/
+src/main/resources/fr/qmn/mamoucalendari/ocr/
 ### resources ###
 !**/src/main/**/resources/fr/qmn/mamoucalendari/bdd/UserRegistre.db
 !**/src/test/**/resources/fr/qmn/mamoucalendari/css/

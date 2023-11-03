@@ -16,6 +16,12 @@ public class TimeLib {
         return formatter.format(new Date());
     }
 
+    //Get actual time at -> 1200 if hours = 12 and minutes = 00
+    public String getActualTimeWithoutColon() {
+        SimpleDateFormat formatter = new SimpleDateFormat("HHmm");
+        return formatter.format(new Date());
+    }
+
     //Get actual date at -> Monday 21 January
     public String getActualDateWithoutYear() {
         SimpleDateFormat formatter = new SimpleDateFormat("EEEE dd MMMM");

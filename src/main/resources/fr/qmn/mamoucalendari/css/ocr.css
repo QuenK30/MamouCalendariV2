@@ -16,6 +16,8 @@
     -fx-border-width: 0;
     -fx-padding: 0;
     -fx-text-fill: red;
+    -fx-stroke: black;
+    -fx-stroke-width: 6px;
     -fx-font-size: 32px;
     -fx-text-alignment: center;
     -fx-opacity: 0.5;
@@ -24,7 +26,6 @@
 
     -fx-alignment: center;
 }
-
 #buttonCheck {
     -fx-background-color: transparent;
     -fx-border-width: 0;
