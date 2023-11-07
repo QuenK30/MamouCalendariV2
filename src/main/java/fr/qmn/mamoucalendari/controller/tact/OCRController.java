@@ -99,11 +99,11 @@ public class OCRController {
         parameters.setFill(Color.TRANSPARENT);
         canvas.snapshot(parameters, image);
         String path = "C:/Users/quenk/IdeaProjects/MamouCalendariV2/src/main/resources/fr/qmn/mamoucalendari/ocr/";
-        File file = new File(path + filename + ".jpg");
+        File file = new File(path + filename + ".tiff");
         System.out.println("File path: " + file.getAbsolutePath());
 
         try {
-            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "jpg", file);
+            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "tiff", file);
             System.out.println("Image saved");
             initOCR.receiveImageForOCR(file.getAbsolutePath());
         } catch (IOException e) {
