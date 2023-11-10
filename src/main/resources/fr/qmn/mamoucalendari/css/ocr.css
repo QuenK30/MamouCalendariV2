@@ -39,3 +39,7 @@
 
     -fx-alignment: center;
 }
+
+#buttonPrevDay:hover, #buttonNextDay:hover, #buttonCancel:hover, #buttonCheck:hover {
+    -fx-opacity: 1;
+}

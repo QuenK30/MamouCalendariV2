@@ -56,11 +56,36 @@ public class OCRController {
         ocrFxml.getStylesheets().add(getClass().getResource("/fr/qmn/mamoucalendari/css/ocr.css").toExternalForm());
         onPressedButtonCancel();
         onValidate();
+        onSliderHours();
+        onSliderMinutes();
 
         graphicsContext = canvasOCR.getGraphicsContext2D();
         graphicsContext.setStroke(Color.BLACK);
         graphicsContext.setLineWidth(3);
     }
+
+    //make slider hours
+    public void onSliderHours() {
+        sliderHours.setMin(0);
+        sliderHours.setMax(23);
+        sliderHours.setValue(12);
+        sliderHours.valueProperty().addListener((observableValue, oldValue, newValue) -> {
+            System.out.println("Slider hours: " + newValue.intValue());
+        });
+    }
+
+    //make slider minutes
+    public void onSliderMinutes() {
+        sliderMinutes.setMin(0);
+        sliderMinutes.setMax(59);
+        sliderMinutes.setValue(30);
+        sliderMinutes.valueProperty().addListener((observableValue, oldValue, newValue) -> {
+            System.out.println("Slider minutes: " + newValue.intValue());
+        });
+    }
+
+
+
     public void setTextActualDay(String date) {
         if (textActualDay == null) {
             System.out.println("textActualDay is null");
@@ -120,7 +145,6 @@ public class OCRController {
         graphicsContext.lineTo(mouseEvent.getX(), mouseEvent.getY());
         graphicsContext.stroke();
         graphicsContext.closePath();
-
     }
 
     public void onMousePressed(MouseEvent mouseEvent) {
