@@ -2,6 +2,10 @@ package fr.qmn.mamoucalendari.controller.tact;
 
 import fr.qmn.mamoucalendari.ocr.InitOCR;
 import fr.qmn.mamoucalendari.utils.TimeLib;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,13 +16,10 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -39,15 +40,14 @@ public class OCRController {
     @FXML
     public Canvas canvasOCR;
     @FXML
-    public Slider sliderHours;
-    @FXML
-    public Slider sliderMinutes;
-    @FXML
     public Button buttonCancel;
     @FXML
     public Button buttonCheck;
     @FXML
     public AnchorPane ocrFxml;
+    public VBox vBoxSliderHours;
+    public VBox vBoxSliderMinutes;
+    public ScrollPane scrollPane;
     @FXML
     private GraphicsContext graphicsContext;
 
@@ -56,35 +56,11 @@ public class OCRController {
         ocrFxml.getStylesheets().add(getClass().getResource("/fr/qmn/mamoucalendari/css/ocr.css").toExternalForm());
         onPressedButtonCancel();
         onValidate();
-        onSliderHours();
-        onSliderMinutes();
 
         graphicsContext = canvasOCR.getGraphicsContext2D();
         graphicsContext.setStroke(Color.BLACK);
         graphicsContext.setLineWidth(3);
     }
-
-    //make slider hours
-    public void onSliderHours() {
-        sliderHours.setMin(0);
-        sliderHours.setMax(23);
-        sliderHours.setValue(12);
-        sliderHours.valueProperty().addListener((observableValue, oldValue, newValue) -> {
-            System.out.println("Slider hours: " + newValue.intValue());
-        });
-    }
-
-    //make slider minutes
-    public void onSliderMinutes() {
-        sliderMinutes.setMin(0);
-        sliderMinutes.setMax(59);
-        sliderMinutes.setValue(30);
-        sliderMinutes.valueProperty().addListener((observableValue, oldValue, newValue) -> {
-            System.out.println("Slider minutes: " + newValue.intValue());
-        });
-    }
-
-
 
     public void setTextActualDay(String date) {
         if (textActualDay == null) {

@@ -40,12 +40,13 @@ public class MCMain extends Application {
 
     public static void main(String[] args) {
         SQLInit sqlInit = new SQLInit();
-        /*SQLManager sqlManager = new SQLManager();
+        SQLManager sqlManager = new SQLManager();
         TasksSelect tasksSelect = new TasksSelect();
-        sqlManager.createTask("2023-09-28", 12, 30, "Test");
-        sqlManager.createTask("2023-09-28", 12, 00, "Test");
-        sqlManager.createTask("2023-09-28", 12, 10, "Test");*/
+        sqlManager.createTask("2023-11-13", 10, 30, "Test1");
+        sqlManager.createTask("2023-11-13", 10, 35, "Test2");
+        sqlManager.createTask("2023-11-13", 10, 40, "Test3");
         sqlInit.createNewDatabase();
+        tasksSelect.getTasksByHour("2023-11-13", 10);
         launch();
     }
 }
