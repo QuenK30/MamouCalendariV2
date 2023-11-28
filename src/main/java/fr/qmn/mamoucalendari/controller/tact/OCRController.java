@@ -45,9 +45,6 @@ public class OCRController {
     public Button buttonCheck;
     @FXML
     public AnchorPane ocrFxml;
-    public VBox vBoxSliderHours;
-    public VBox vBoxSliderMinutes;
-    public ScrollPane scrollPane;
     @FXML
     private GraphicsContext graphicsContext;
 
