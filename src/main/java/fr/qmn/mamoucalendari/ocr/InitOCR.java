@@ -1,27 +1,39 @@
 package fr.qmn.mamoucalendari.ocr;
 
+import fr.qmn.mamoucalendari.bdd.SQLManager;
+import fr.qmn.mamoucalendari.utils.TimeLib;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 
 import java.io.File;
+import java.io.IOException;
 
 public class InitOCR {
+    private SQLManager sqlManager = new SQLManager();
+    private String scriptPath = "src/main/java/fr/qmn/mamoucalendari/ocr/OCROpenAI.py";
 
-    public void receiveImageForOCR(String imgPath) {
-        System.out.println("receiveImageForOCR: " + imgPath);
-        String result = "";
-        String tessPath = "src/main/resources/fr/qmn/mamoucalendari/data";
-        ITesseract instance = new Tesseract();
-        instance.setDatapath(tessPath);
-        instance.setLanguage("fra");
-        System.out.println("Tesseract");
+    public void receiveImageForOCR(String imgPath, String hours, String minutes, String date) {
+        TimeLib timeLib = new TimeLib();
         try {
-            result = instance.doOCR(new File(imgPath));
+            ProcessBuilder pb = new ProcessBuilder("python", scriptPath, imgPath);
+            Process p = pb.start();
+            String result = pb.command().get(1);
             System.out.println(result);
-            System.out.println("OCR done");
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            int exitCode = p.waitFor();
+            System.out.println("Exited with error code : " + exitCode);
+            if (exitCode == 0) {
+                String convertDate = timeLib.convertDate(date);
+                System.out.println("Date: " + convertDate);
+                sqlManager.createTask(convertDate, Integer.parseInt(hours), Integer.parseInt(minutes), result);
+                System.out.println("Successfully added task to database");
+                System.out.println("Task: " + result + " at " + hours + ":" + minutes + " on " + convertDate);
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
+
+    // Python script for calling OCR openai
+
 
 }

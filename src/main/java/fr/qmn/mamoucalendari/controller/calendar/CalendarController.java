@@ -37,6 +37,7 @@ public class CalendarController {
                                "Août", "Septembre", "Octobre", "Novembre", "Décembre"};
     private String beforeMonth = "";
     private String afterMonth = "";
+    private String year = "";
     public AnchorPane calendar;
 
 
@@ -53,18 +54,33 @@ public class CalendarController {
         Timeline timeline = new Timeline(
                 new KeyFrame(Duration.seconds(1), actionEvent ->
                 {
-                    Calendar getFirstDay = Calendar.getInstance();
-                    int month = getFirstDay.get(Calendar.MONTH);
+                    Calendar getCalendar = Calendar.getInstance();
+                    int month = getCalendar.get(Calendar.MONTH);
+                    year = String.valueOf(getCalendar.get(Calendar.YEAR));
                     textActualMonth.setFont(font);
                     textActualMonth.setText(months[month]);
-                    buttonPreviousMonth.setText(months[month - 1]);
-                    buttonNextMonth.setText(months[month + 1]);
+                    if (month == 11) { // if the month is December
+                        buttonNextMonth.setText(months[0]);
+                        year = String.valueOf(Integer.parseInt(year) + 1);
+                    } else {
+                        buttonNextMonth.setText(months[month + 1]);
+                    }
+                    if (month == 0) { // if the month is January
+                        buttonPreviousMonth.setText(months[11]);
+                        year = String.valueOf(Integer.parseInt(year) - 1);
+                    } else {
+                        buttonPreviousMonth.setText(months[month - 1]);
+                    }
 
                     // set button with id j1 -> j35
-                    getFirstDay.set(Calendar.DAY_OF_MONTH, 1);
-                    Calendar getDaysInMonth = Calendar.getInstance();
-                    int daysInMonth = getDaysInMonth.getActualMaximum(Calendar.DAY_OF_MONTH);
-                    int firstDay = (getFirstDay.get(Calendar.DAY_OF_WEEK) + 5) % 7 + 1;
+                    getCalendar.set(Calendar.DAY_OF_MONTH, 1);
+                    int daysInMonth = getCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+                    int rawDayOfWeek = getCalendar.get(Calendar.DAY_OF_WEEK);
+                    int firstDay = rawDayOfWeek - 1;
+                    if (firstDay == 0) {
+                        firstDay = 7;
+                    }
+
                     for (int i = 1; i < buttons.length; i++) {
                         buttons[i] = (Button) calendar.lookup("#j" + i);
                         buttons[i].setFont(font);
@@ -102,7 +118,14 @@ public class CalendarController {
                                 rectangles[i].setFill(Color.rgb(158, 158, 158, 0.3));
                                 rectangles[i].setStroke(Color.web("#ff9d9d"));
                                 rectangles[i].setStrokeWidth(6);
-                                afterMonth = months[month + 1];
+                                switch (month) {
+                                    case 0 -> afterMonth = months[month + 1];
+                                    case 11 -> beforeMonth = months[month - 1];
+                                    default -> {
+                                        beforeMonth = months[month - 1];
+                                        afterMonth = months[month + 1];
+                                    }
+                                }
                             }
                         }
                     }
@@ -113,21 +136,23 @@ public class CalendarController {
     }
     public void setActionOnDayButton() {
         Button[] buttons = new Button[43];
+        Rectangle[] rectangles = new Rectangle[43];
         for (int i = 1; i < buttons.length; i++) {
             buttons[i] = (Button) calendar.lookup("#j" + i);
             int finalI = i;
             buttons[i].setOnAction(actionEvent -> {
-                //date = day + number of day + month
-                String month = "";
-                // if the day is before the month
-                if (finalI < 8) {
+                rectangles[finalI] = (Rectangle) calendar.lookup("#rect" + finalI);
+                String month;
+                if (rectangles[finalI].getFill().equals(Color.rgb(158, 158, 158))) {
                     month = beforeMonth;
-                } else if (finalI > 35) { // if the day is after the month
+                } else if (rectangles[finalI].getFill().equals(Color.rgb(158, 158, 158, 0.3))) {
                     month = afterMonth;
-                } else { // if the day is in the month
+                } else {
                     month = textActualMonth.getText();
                 }
-                String date = days[finalI % 7] + " " + buttons[finalI].getText() + " " + month;
+
+                int dayIndex = (finalI - 1) % 7; // 0 = Monday, 1 = Tuesday, etc.
+                String date = days[dayIndex] + " " + buttons[finalI].getText() + " " + month;
                 System.out.println(date);
                 //open ocr window
                 ((Node) (actionEvent.getSource())).getScene().getWindow().hide();

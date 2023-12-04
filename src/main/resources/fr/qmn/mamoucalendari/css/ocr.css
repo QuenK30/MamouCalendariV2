@@ -43,3 +43,36 @@
 #buttonPrevDay:hover, #buttonNextDay:hover, #buttonCancel:hover, #buttonCheck:hover {
     -fx-opacity: 1;
 }
+
+.list-view {
+    -fx-background-insets: 0;
+    -fx-background-color: transparent;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: black;
+    -fx-opacity: 0.3;
+    -fx-alignment: center;
+    -fx-font-size: 24px;
+    -fx-padding: 10px;
+}
+
+.list-cell:selected {
+    -fx-opacity: 1;
+    -fx-font-weight: bold;
+    -fx-background-color: #F3CFCE; /* Couleur pour la cellule sélectionnée */
+}
+
+/* Cachez la barre de défilement */
+.scroll-bar {
+    -fx-opacity: 0;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+/* Style pour les cellules afin de créer un effet de roulette */
+.list-cell {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+}
