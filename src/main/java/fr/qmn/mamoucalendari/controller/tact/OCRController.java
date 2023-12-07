@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.stage.Popup;
 import javafx.util.StringConverter;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
@@ -29,7 +30,12 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Year;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
 
 public class OCRController {
     @FXML
@@ -78,6 +84,44 @@ public class OCRController {
         Font font = Font.loadFont(getClass().getResourceAsStream("/fr/qmn/mamoucalendari/font/Ubuntu-Bold.ttf"), 32);
         textActualDay.setFont(font);
         textActualDay.setText(date);
+        setTextDayButton();
+    }
+
+    private void setTextDayButton() {
+        String date = textActualDay.getText();
+        String[] dateSplit = date.split(" ");
+        String day = dateSplit[0];
+
+        switch (day){
+            case "Lundi":
+                buttonPrevDay.setText("Dimanche");
+                buttonNextDay.setText("Mardi");
+                break;
+            case "Mardi":
+                buttonPrevDay.setText("Lundi");
+                buttonNextDay.setText("Mercredi");
+                break;
+            case "Mercredi":
+                buttonPrevDay.setText("Mardi");
+                buttonNextDay.setText("Jeudi");
+                break;
+            case "Jeudi":
+                buttonPrevDay.setText("Mercredi");
+                buttonNextDay.setText("Vendredi");
+                break;
+            case "Vendredi":
+                buttonPrevDay.setText("Jeudi");
+                buttonNextDay.setText("Samedi");
+                break;
+            case "Samedi":
+                buttonPrevDay.setText("Vendredi");
+                buttonNextDay.setText("Dimanche");
+                break;
+            case "Dimanche":
+                buttonPrevDay.setText("Samedi");
+                buttonNextDay.setText("Lundi");
+                break;
+        }
     }
 
     public void onValidate() {
@@ -85,7 +129,57 @@ public class OCRController {
             System.out.println("Validate");
             TimeLib timeLib = new TimeLib();
             captureScreenshot(canvasOCR, timeLib.getActualTimeWithoutColon()+"_ocr");
+
             System.out.println("Screenshot saved");
+        });
+    }
+
+    private void captureScreenshot(Canvas canvas, String filename) {
+        InitOCR initOCR = new InitOCR();
+        WritableImage image = new WritableImage((int) canvas.getWidth(), (int) canvas.getHeight());
+        SnapshotParameters parameters = new SnapshotParameters();
+        parameters.setFill(Color.WHITE);
+        canvas.snapshot(parameters, image);
+        String path = "C:/Users/quenk/IdeaProjects/MamouCalendariV2/src/main/resources/fr/qmn/mamoucalendari/ocr/";
+        File file = new File(path + filename + ".png");
+        System.out.println("File path: " + file.getAbsolutePath());
+        String result;
+        try {
+            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+            System.out.println("Image saved");
+            result = initOCR.receiveImageForOCR(file.getAbsolutePath(), hoursSelected, minutesSelected, textActualDay.getText());
+            System.out.println("after image saved Result: " + result);
+            checkIfEntryIsCorrect(result);
+        } catch (IOException e) {
+            System.out.println("OCR Error: " + e);
+        }
+    }
+
+    public void checkIfEntryIsCorrect(String text) {
+        Popup popup = new Popup();
+
+        VBox vBox = new VBox();
+        vBox.setStyle("-fx-background-color: #ffd9d8");
+        vBox.setPrefWidth(400);
+        vBox.setPrefHeight(300);
+        vBox.setAlignment(Pos.CENTER);
+        vBox.setSpacing(20);
+
+        Label label = new Label("Voulez-vous valider cette tâches ?");
+        label.setStyle("-fx-font-size: 20px");
+
+        Label result = new Label(text);
+        result.setStyle("-fx-font-size: 20px");
+        result.setAlignment(Pos.CENTER);
+
+        Button buttonYes = new Button("Oui");
+        buttonYes.setStyle("-fx-background-color: #00ff00");
+        buttonYes.setPrefWidth(100);
+        buttonYes.setPrefHeight(50);
+        buttonYes.setOnAction(actionEvent -> {
+            popup.hide();
+            //TODO: add entry to database
+            System.out.println("Yes");
             ((Node) (actionEvent.getSource())).getScene().getWindow().hide();
             try {
                 InputStream fxmlStream = getClass().getResourceAsStream("/fr/qmn/mamoucalendari/design/SecondScreenCalendar.fxml");
@@ -99,27 +193,25 @@ public class OCRController {
                 e.printStackTrace();
             }
         });
+
+        Button buttonNo = new Button("Non");
+        buttonNo.setStyle("-fx-background-color: #ff0000");
+        buttonNo.setPrefWidth(100);
+        buttonNo.setPrefHeight(50);
+        buttonNo.setOnAction(actionEvent -> {
+            popup.hide();
+            clearCanvas();
+            System.out.println("No");
+        });
+
+        vBox.getChildren().addAll(label,result, buttonYes, buttonNo);
+        popup.getContent().add(vBox);
+        popup.show(ocrFxml.getScene().getWindow());
     }
 
-    private void captureScreenshot(Canvas canvas, String filename) {
-        InitOCR initOCR = new InitOCR();
-        WritableImage image = new WritableImage((int) canvas.getWidth(), (int) canvas.getHeight());
-        SnapshotParameters parameters = new SnapshotParameters();
-        parameters.setFill(Color.WHITE);
-        canvas.snapshot(parameters, image);
-        String path = "C:/Users/quenk/IdeaProjects/MamouCalendariV2/src/main/resources/fr/qmn/mamoucalendari/ocr/";
-        File file = new File(path + filename + ".png");
-        System.out.println("File path: " + file.getAbsolutePath());
-
-        try {
-            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-            System.out.println("Image saved");
-            initOCR.receiveImageForOCR(file.getAbsolutePath(), hoursSelected, minutesSelected, textActualDay.getText());
-        } catch (IOException e) {
-            System.out.println("OCR Error: " + e);
-        }
+    private void clearCanvas() {
+        graphicsContext.clearRect(0, 0, canvasOCR.getWidth(), canvasOCR.getHeight());
     }
-
     public void onMouseDragged(MouseEvent mouseEvent) {
         graphicsContext.lineTo(mouseEvent.getX(), mouseEvent.getY());
         graphicsContext.stroke();
@@ -149,7 +241,6 @@ public class OCRController {
         int currentHour = ListHours.getSelectionModel().getSelectedIndex();
         ListHours.scrollTo(currentHour);
         ListHours.getSelectionModel().select(currentHour);
-        //get text from list and set it to hoursSelected variable
         hoursSelected = ListHours.getSelectionModel().getSelectedItem().toString();
         System.out.println(hoursSelected);
     }

@@ -4,9 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class TimeLib {
-    private String[] days = {"Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"};
-    private String[] months = {"Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet",
-            "Août", "Septembre", "Octobre", "Novembre", "Décembre"};
     //Get actual date at -> 2023-01-21
     public String getActualDate() {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -52,5 +49,4 @@ public class TimeLib {
             throw new RuntimeException(e);
         }
     }
-
 }

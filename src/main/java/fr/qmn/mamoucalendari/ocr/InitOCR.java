@@ -9,31 +9,25 @@ import java.io.File;
 import java.io.IOException;
 
 public class InitOCR {
-    private SQLManager sqlManager = new SQLManager();
-    private String scriptPath = "src/main/java/fr/qmn/mamoucalendari/ocr/OCROpenAI.py";
+    private String scriptPath = "src/main/java/fr/qmn/mamoucalendari/ocr/scripts/OCROpenAICall.py";
 
-    public void receiveImageForOCR(String imgPath, String hours, String minutes, String date) {
+    public String receiveImageForOCR(String imgPath, String hours, String minutes, String date) {
         TimeLib timeLib = new TimeLib();
         try {
             ProcessBuilder pb = new ProcessBuilder("python", scriptPath, imgPath);
             Process p = pb.start();
             String result = pb.command().get(1);
-            System.out.println(result);
+            System.out.println("result : "+result);
             int exitCode = p.waitFor();
             System.out.println("Exited with error code : " + exitCode);
             if (exitCode == 0) {
-                String convertDate = timeLib.convertDate(date);
-                System.out.println("Date: " + convertDate);
-                sqlManager.createTask(convertDate, Integer.parseInt(hours), Integer.parseInt(minutes), result);
-                System.out.println("Successfully added task to database");
-                System.out.println("Task: " + result + " at " + hours + ":" + minutes + " on " + convertDate);
+                return result;
+            }else {
+                return "error";
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
-
-    // Python script for calling OCR openai
-
 
 }
