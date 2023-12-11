@@ -5,8 +5,6 @@ module fr.qmn.mamoucalendari {
     requires javafx.graphics;
     requires javafx.swing;
     requires org.xerial.sqlitejdbc;
-    requires tess4j;
-    requires lept4j;
 
 
     opens fr.qmn.mamoucalendari to javafx.fxml;
