@@ -69,29 +69,37 @@ public class TasksSelect {
     }
 
     //Get closest task by actual time and date
-    public Tasks[] getClosestTaskByTime(String date, String hours, String minutes){
-        Tasks previousTask = null,currentTask = null, nextTask = null;
-        try {
-            Class.forName("org.sqlite.JDBC");
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/main/resources/fr/qmn/mamoucalendari/bdd/UserRegistre.db");
+    public Tasks[] getClosestTaskByTime(String date, int hours, int minutes) {
+        Tasks previousTask = null, currentTask = null, nextTask = null;
+
+        String url = "jdbc:sqlite:src/main/resources/fr/qmn/mamoucalendari/bdd/UserRegistre.db";
+
+        try (Connection connection = DriverManager.getConnection(url)) {
             if (connection != null) {
-                ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM USERS WHERE DATE = '" + date + "' AND HOURS = '" + hours + "' AND MINUTES = '" + minutes + "'");
-                while (resultSet.next()) {
-                    currentTask = new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"));
-                }
-                resultSet = connection.createStatement().executeQuery("SELECT * FROM USERS WHERE DATE = '" + date + "' AND HOURS = '" + hours + "' AND MINUTES < '" + minutes + "' ORDER BY MINUTES DESC LIMIT 1");
-                while (resultSet.next()) {
-                    previousTask = new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"));
-                }
-                resultSet = connection.createStatement().executeQuery("SELECT * FROM USERS WHERE DATE = '" + date + "' AND HOURS = '" + hours + "' AND MINUTES > '" + minutes + "' ORDER BY MINUTES ASC LIMIT 1");
-                while (resultSet.next()) {
-                    nextTask = new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"));
+                currentTask = getTask(connection, date, hours, minutes, "=");
+                previousTask = getTask(connection, date, hours, minutes, "<");
+                nextTask = getTask(connection, date, hours, minutes, ">");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        return new Tasks[]{previousTask, currentTask, nextTask};
+    }
+
+    private Tasks getTask(Connection connection, String date, int hours, int minutes, String operator) throws SQLException {
+        String query = "SELECT * FROM USERS WHERE DATE = ? AND HOURS = ? AND MINUTES " + operator + " ? ORDER BY MINUTES " + ("=".equals(operator) ? "" : (">".equals(operator) ? "ASC" : "DESC")) + " LIMIT 1";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, date);
+            pstmt.setInt(2, hours);
+            pstmt.setInt(3, minutes);
+            try (ResultSet resultSet = pstmt.executeQuery()) {
+                if (resultSet.next()) {
+                    return new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"));
                 }
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
-        return new Tasks[]{previousTask, currentTask, nextTask};
+        return null;
     }
 
 

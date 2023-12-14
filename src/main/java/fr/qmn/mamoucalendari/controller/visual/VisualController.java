@@ -1,6 +1,5 @@
 package fr.qmn.mamoucalendari.controller.visual;
 
-import fr.qmn.mamoucalendari.bdd.SQLManager;
 import fr.qmn.mamoucalendari.tasks.Tasks;
 import fr.qmn.mamoucalendari.tasks.TasksSelect;
 import fr.qmn.mamoucalendari.utils.StringLib;
@@ -11,8 +10,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.swing.*;
 
 public class VisualController {
     public Text textDate;
@@ -47,50 +45,43 @@ public class VisualController {
         textCountTasks.setText(String.valueOf(tasksSelect.getAllTasksByDate(actualDate).size()));
     }
 
-    private void setTasks(){
+    private void setTasks() {
         TasksSelect tasksSelect = new TasksSelect();
         TimeLib timeLib = new TimeLib();
-        SQLManager sqlManager = new SQLManager();
 
-        String actualDate = timeLib.getActualDate(); // 2023-01-21
-        String actualHoursTime = timeLib.getActualTime().split(":")[0]; // 12:00 -> 12
-        String actualMinutesTime = timeLib.getActualTime().split(":")[1]; // 12:00 -> 00
-
-        // Get all tasks by date
-        List<Tasks> allTasksByDate = tasksSelect.getAllTasksByDate(actualDate);
-        ArrayList<String> tasksList = new ArrayList<>();
-        ArrayList<String> hoursAndMinutesList = new ArrayList<>();
-        for (Tasks tasks : allTasksByDate) {
-            tasksList.add(tasks.getTasks());
-            hoursAndMinutesList.add(tasks.getHours() + ":" + tasks.getMinutes());
+        String actualDate = timeLib.getActualDate();
+        String[] timeParts = timeLib.getActualTime().split(":");
+        if (timeParts.length != 2) {
+            throw new IllegalArgumentException("Le format de l'heure n'est pas valide");
         }
 
-        //Get closest task by actual time
+        int actualHoursTime = Integer.parseInt(timeParts[0]);
+        int actualMinutesTime = Integer.parseInt(timeParts[1]);
+
+        // Get closest task by actual time
         Tasks[] closestTask = tasksSelect.getClosestTaskByTime(actualDate, actualHoursTime, actualMinutesTime);
 
-        if (closestTask[0] != null) {
-            textBeforeHours.setText(closestTask[0].getHours() + ":" + closestTask[0].getMinutes());
-            textBeforeTasks.setText(closestTask[0].getTasks());
-        } else {
-            textBeforeHours.setText("00:00");
-            textBeforeTasks.setText("Aucune tâche");
-        }
+        updateTaskUI(textBeforeHours, textBeforeTasks, closestTask[0]);
 
-        if (closestTask[1] != null) {
-            textActualHours.setText(closestTask[1].getHours() + ":" + closestTask[1].getMinutes());
-            textActualTasks.setText(closestTask[1].getTasks());
-        } else {
-            textActualHours.setText("00:00");
-            textActualTasks.setText("Aucune tâche");
-        }
+        // Use the next task as the current task if the actual task is null
+        Tasks currentTask = closestTask[1] != null ? closestTask[1] : closestTask[2];
+        updateTaskUI(textActualHours, textActualTasks, currentTask);
 
-        if (closestTask[2] != null) {
-            textAfterHours.setText(closestTask[2].getHours() + ":" + closestTask[2].getMinutes());
-            textAfterTasks.setText(closestTask[2].getTasks());
-        } else {
-            textAfterHours.setText("00:00");
-            textAfterTasks.setText("Aucune tâche");
+        if (closestTask[2] == currentTask) {
+            updateTaskUI(textAfterHours, textAfterTasks, null);
+        }else {
+            updateTaskUI(textAfterHours, textAfterTasks, closestTask[2]);
         }
+    }
 
+    private void updateTaskUI(Text timeLabel, Text taskLabel, Tasks task) {
+        if (task != null) {
+            String formattedTime = String.format("%02d:%02d", task.getHours(), task.getMinutes());
+            timeLabel.setText(formattedTime);
+            taskLabel.setText(task.getTasks());
+        } else {
+            timeLabel.setText("00:00");
+            taskLabel.setText("Aucune tâche");
+        }
     }
 }
