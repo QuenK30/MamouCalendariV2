@@ -140,7 +140,7 @@ public class OCRController {
         SnapshotParameters parameters = new SnapshotParameters();
         parameters.setFill(Color.WHITE);
         canvas.snapshot(parameters, image);
-        String path = "C:/Users/quenk/IdeaProjects/MamouCalendariV2/src/main/resources/fr/qmn/mamoucalendari/ocr/";
+        String path = "src/main/resources/fr/qmn/mamoucalendari/ocr/";
         File file = new File(path + filename + ".png");
         System.out.println("File path: " + file.getAbsolutePath());
         String result;

@@ -48,9 +48,6 @@ public class MCMain extends Application {
         sqlManager.createTask("2023-12-14", 23, 53, "Test2");
         sqlManager.createTask("2023-12-14", 23, 55, "Test3");
          */
-        sqlManager.createTask("2023-12-15", 0, 8, "Test1");
-        sqlManager.createTask("2023-12-15", 0, 9, "Test2");
-        sqlManager.createTask("2023-12-15", 0, 12, "Test3");
         launch();
     }
 }
