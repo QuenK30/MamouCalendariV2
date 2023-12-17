@@ -1,6 +1,8 @@
 package fr.qmn.mamoucalendari.controller.calendar;
 
 import fr.qmn.mamoucalendari.controller.tact.OCRController;
+import fr.qmn.mamoucalendari.utils.SoundLib;
+import fr.qmn.mamoucalendari.utils.TimeLib;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
@@ -137,6 +139,7 @@ public class CalendarController {
     public void setActionOnDayButton() {
         Button[] buttons = new Button[43];
         Rectangle[] rectangles = new Rectangle[43];
+        TimeLib timeLib = new TimeLib();
         for (int i = 1; i < buttons.length; i++) {
             buttons[i] = (Button) calendar.lookup("#j" + i);
             int finalI = i;
@@ -152,8 +155,13 @@ public class CalendarController {
                 }
 
                 int dayIndex = (finalI - 1) % 7; // 0 = Monday, 1 = Tuesday, etc.
-                String date = days[dayIndex] + " " + buttons[finalI].getText() + " " + month;
+                String date = days[dayIndex] + " " + buttons[finalI].getText() + " " + month; // Monday 1 January
+                String realDate =  days[dayIndex] + " " + buttons[finalI].getText() + " " + month + " " + year; // Monday 1 January 2021
                 System.out.println(date);
+                System.out.println(realDate);
+                String convertDate = timeLib.convertDate(realDate); // 2021-01-01
+                SoundLib soundLib = new SoundLib();
+                soundLib.testSound();
                 //open ocr window
                 ((Node) (actionEvent.getSource())).getScene().getWindow().hide();
                 try {
@@ -165,7 +173,7 @@ public class CalendarController {
                     Stage stage = new Stage();
                     stage.setScene(new Scene(root));
                     stage.show();
-                    ocrController.setTextActualDay(date);
+                    ocrController.setTextActualDay(date, convertDate);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

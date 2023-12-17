@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class InitOCR {
-    private final String scriptPath = "src/main/java/fr/qmn/mamoucalendari/ocr/scripts/OCRScripts.py";
+    private final String scriptPath = "src/main/java/fr/qmn/mamoucalendari/ocr/scripts/OCRCall.py";
 
-    public String receiveImageForOCR(String imgPath, String hours, String minutes, String date) {
+    public String receiveImageForOCR(String imgPath) {
         TimeLib timeLib = new TimeLib();
         StringBuilder output = new StringBuilder();
         try {
@@ -34,7 +34,10 @@ public class InitOCR {
             System.out.println("Exited with error code : " + exitCode);
 
             if (exitCode == 0 && !isError) {
-                return output.toString();
+                String result = output.toString();
+                int start = result.indexOf("<");
+                int end = result.indexOf(">");
+                return result.substring(start + 1, end);
             } else {
                 return "Error in OCR Process: " + output;
             }

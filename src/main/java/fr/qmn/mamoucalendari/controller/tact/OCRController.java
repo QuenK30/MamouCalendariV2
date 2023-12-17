@@ -1,5 +1,6 @@
 package fr.qmn.mamoucalendari.controller.tact;
 
+import fr.qmn.mamoucalendari.bdd.SQLManager;
 import fr.qmn.mamoucalendari.ocr.InitOCR;
 import fr.qmn.mamoucalendari.utils.TimeLib;
 import javafx.collections.FXCollections;
@@ -60,8 +61,9 @@ public class OCRController {
     private GraphicsContext graphicsContext;
     private double startY;
     private int startIndex;
-    private String hoursSelected;
-    private String minutesSelected;
+    private String hoursSelected = null;
+    private String minutesSelected = null;
+    private String dateConverted;
 
     public void initialize() {
         //load css
@@ -76,7 +78,7 @@ public class OCRController {
         graphicsContext.setLineWidth(3);
     }
 
-    public void setTextActualDay(String date) {
+    public void setTextActualDay(String date, String dateConverted) {
         if (textActualDay == null) {
             System.out.println("textActualDay is null");
             return;
@@ -85,6 +87,7 @@ public class OCRController {
         textActualDay.setFont(font);
         textActualDay.setText(date);
         setTextDayButton();
+        this.dateConverted = dateConverted;
     }
 
     private void setTextDayButton() {
@@ -127,7 +130,33 @@ public class OCRController {
     public void onValidate() {
         buttonCheck.setOnAction(actionEvent -> {
             System.out.println("Validate");
+            Popup popup = new Popup();
             TimeLib timeLib = new TimeLib();
+            if(hoursSelected == null || minutesSelected == null){
+                System.out.println("hoursSelected or minutesSelected is null");
+                VBox vBox = new VBox();
+                vBox.setStyle("-fx-background-color: #ffd9d8");
+                vBox.setPrefWidth(600);
+                vBox.setPrefHeight(400);
+                vBox.setAlignment(Pos.CENTER);
+                vBox.setSpacing(20);
+
+                Label label = new Label("Erreur, veuillez sélectionner une heure et une minute \n avant de valider la tâche.");
+                label.setStyle("-fx-font-size: 20px");
+
+                Button buttonOk = new Button("Ok");
+                buttonOk.setStyle("-fx-background-color: #00ff00");
+                buttonOk.setPrefWidth(100);
+                buttonOk.setPrefHeight(50);
+                buttonOk.setOnAction(actionEvent1 -> {
+                    popup.hide();
+                });
+
+                vBox.getChildren().addAll(label, buttonOk);
+                popup.getContent().add(vBox);
+                popup.show(ocrFxml.getScene().getWindow());
+                return;
+            }
             captureScreenshot(canvasOCR, timeLib.getActualTimeWithoutColon()+"_ocr");
 
             System.out.println("Screenshot saved");
@@ -147,16 +176,17 @@ public class OCRController {
         try {
             ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
             System.out.println("Image saved");
-            result = initOCR.receiveImageForOCR(file.getAbsolutePath(), hoursSelected, minutesSelected, textActualDay.getText());
+            result = initOCR.receiveImageForOCR(file.getAbsolutePath());
             System.out.println("after image saved Result: " + result);
-            checkIfEntryIsCorrect(result);
+            checkIfEntryIsCorrect(result, dateConverted, Integer.parseInt(hoursSelected), Integer.parseInt(minutesSelected));
         } catch (IOException e) {
             System.out.println("OCR Error: " + e);
         }
     }
 
-    public void checkIfEntryIsCorrect(String text) {
+    public void checkIfEntryIsCorrect(String text, String date, int hours, int minutes) {
         Popup popup = new Popup();
+        SQLManager sqlManager = new SQLManager();
 
         VBox vBox = new VBox();
         vBox.setStyle("-fx-background-color: #ffd9d8");
@@ -168,7 +198,7 @@ public class OCRController {
         Label label = new Label("Voulez-vous valider cette tâches ?");
         label.setStyle("-fx-font-size: 20px");
 
-        Label result = new Label(text);
+        Label result = new Label(date + " à " + hours + "h" + minutes + "m\n" + text);
         result.setStyle("-fx-font-size: 20px");
         result.setAlignment(Pos.CENTER);
 
@@ -179,6 +209,7 @@ public class OCRController {
         buttonYes.setOnAction(actionEvent -> {
             popup.hide();
             //TODO: add entry to database
+            sqlManager.createTask(date, hours, minutes, text, false);
             System.out.println("Yes");
             ((Node) (actionEvent.getSource())).getScene().getWindow().hide();
             try {

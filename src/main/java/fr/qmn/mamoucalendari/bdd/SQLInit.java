@@ -15,7 +15,8 @@ public class SQLInit {
                         "DATE TEXT NOT NULL," +
                         "HOURS INTEGER NOT NULL," +
                         "MINUTES INTEGER NOT NULL," +
-                        "TASKS TEXT NOT NULL)";
+                        "TASKS TEXT NOT NULL," +
+                        "ISDONE BOOLEAN NOT NULL)";
                 statement.executeUpdate(createUserTable);
                 statement.close();
                 System.out.println("| La base de données a été créée avec succès            |");

@@ -2,6 +2,7 @@ package fr.qmn.mamoucalendari.controller.visual;
 
 import fr.qmn.mamoucalendari.tasks.Tasks;
 import fr.qmn.mamoucalendari.tasks.TasksSelect;
+import fr.qmn.mamoucalendari.utils.SoundLib;
 import fr.qmn.mamoucalendari.utils.StringLib;
 import fr.qmn.mamoucalendari.utils.TimeLib;
 import javafx.animation.KeyFrame;
@@ -9,8 +10,6 @@ import javafx.animation.Timeline;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-
-import javax.swing.*;
 
 public class VisualController {
     public Text textDate;
@@ -46,6 +45,26 @@ public class VisualController {
     }
 
     private void setTasks() {
+        Tasks[] closestTask = getClosestTask();
+
+        updateTaskUI(textBeforeHours, textBeforeTasks, closestTask[0]);
+
+        // Use the next task as the current task if the actual task is null
+        Tasks currentTask = closestTask[1] != null ? closestTask[1] : closestTask[2];
+        updateTaskUI(textActualHours, textActualTasks, currentTask);
+        SoundLib soundLib = new SoundLib();
+        if (currentTask != null) {
+            soundLib.playSound("src/main/resources/fr/qmn/mamoucalendari/sounds/ding.wav");
+        }
+
+        if (closestTask[2] == currentTask) {
+            updateTaskUI(textAfterHours, textAfterTasks, null);
+        }else {
+            updateTaskUI(textAfterHours, textAfterTasks, closestTask[2]);
+        }
+    }
+
+    private Tasks[] getClosestTask() {
         TasksSelect tasksSelect = new TasksSelect();
         TimeLib timeLib = new TimeLib();
 
@@ -59,19 +78,7 @@ public class VisualController {
         int actualMinutesTime = Integer.parseInt(timeParts[1]);
 
         // Get closest task by actual time
-        Tasks[] closestTask = tasksSelect.getClosestTaskByTime(actualDate, actualHoursTime, actualMinutesTime);
-
-        updateTaskUI(textBeforeHours, textBeforeTasks, closestTask[0]);
-
-        // Use the next task as the current task if the actual task is null
-        Tasks currentTask = closestTask[1] != null ? closestTask[1] : closestTask[2];
-        updateTaskUI(textActualHours, textActualTasks, currentTask);
-
-        if (closestTask[2] == currentTask) {
-            updateTaskUI(textAfterHours, textAfterTasks, null);
-        }else {
-            updateTaskUI(textAfterHours, textAfterTasks, closestTask[2]);
-        }
+        return tasksSelect.getClosestTaskByTime(actualDate, actualHoursTime, actualMinutesTime);
     }
 
     private void updateTaskUI(Text timeLabel, Text taskLabel, Tasks task) {
@@ -84,4 +91,6 @@ public class VisualController {
             taskLabel.setText("Aucune tâche");
         }
     }
+
+    //TODO: task reminder -> 30 minutes before | 15 minutes before | 5 minutes before | 1 minute before | 0 minute before
 }

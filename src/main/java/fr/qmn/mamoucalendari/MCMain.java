@@ -44,9 +44,11 @@ public class MCMain extends Application {
         TasksSelect tasksSelect = new TasksSelect();
         sqlInit.createNewDatabase();
         /*
-        sqlManager.createTask("2023-12-14", 23, 50, "Test1");
-        sqlManager.createTask("2023-12-14", 23, 53, "Test2");
-        sqlManager.createTask("2023-12-14", 23, 55, "Test3");
+        sqlManager.createTask("2023-12-16", 22, 0, "Test1", false);
+        sqlManager.createTask("2023-12-16", 22, 15, "Test2", false);
+        sqlManager.createTask("2023-12-16", 22, 30, "Test3", false);
+        sqlManager.createTask("2023-12-16", 22, 45, "Test4", false);
+        sqlManager.createTask("2023-12-16", 23, 0, "Test5", false);
          */
         launch();
     }

@@ -1,5 +1,6 @@
 package fr.qmn.mamoucalendari.tasks;
 
+import fr.qmn.mamoucalendari.utils.SoundLib;
 import fr.qmn.mamoucalendari.utils.TimeLib;
 
 import java.sql.*;
@@ -19,7 +20,7 @@ public class TasksSelect {
             if (connection != null) {
                 ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM USERS WHERE DATE = '" + date + "'");
                 while (resultSet.next()) {
-                    Tasks tasks = new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"));
+                    Tasks tasks = new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"), false);
                     tasksList.add(tasks);
                     countTasks++;
                 }
@@ -39,7 +40,7 @@ public class TasksSelect {
             if (connection != null) {
                 ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM USERS WHERE DATE = '" + date + "'");
                 while (resultSet.next()) {
-                    Tasks tasks = new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"));
+                    Tasks tasks = new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"), resultSet.getBoolean("ISDONE"));
                     tasksList.add(tasks);
                 }
             }
@@ -58,7 +59,7 @@ public class TasksSelect {
             if (connection != null) {
                 ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM USERS WHERE DATE = '" + date + "' AND HOURS = '" + hours + "'");
                 while (resultSet.next()) {
-                    Tasks tasks = new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"));
+                    Tasks tasks = new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"), resultSet.getBoolean("ISDONE"));
                     tasksList.add(tasks);
                 }
             }
@@ -95,12 +96,31 @@ public class TasksSelect {
             pstmt.setInt(3, minutes);
             try (ResultSet resultSet = pstmt.executeQuery()) {
                 if (resultSet.next()) {
-                    return new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"));
+                    return new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"), resultSet.getBoolean("ISDONE"));
                 }
             }
         }
         return null;
     }
 
-
+    //Set tasks done
+    public void setTasksDone(String date, int hours, int minutes) {
+        String url = "jdbc:sqlite:src/main/resources/fr/qmn/mamoucalendari/bdd/UserRegistre.db";
+        String query = "UPDATE USERS SET ISDONE = ? WHERE DATE = ? AND HOURS = ? AND MINUTES = ?";
+        try (Connection connection = DriverManager.getConnection(url)) {
+            if (connection != null) {
+                try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+                    pstmt.setBoolean(1, true);
+                    pstmt.setString(2, date);
+                    pstmt.setInt(3, hours);
+                    pstmt.setInt(4, minutes);
+                    pstmt.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        SoundLib soundLib = new SoundLib();
+        soundLib.playSound("src/main/resources/fr/qmn/mamoucalendari/sounds/done.wav");
+    }
 }
