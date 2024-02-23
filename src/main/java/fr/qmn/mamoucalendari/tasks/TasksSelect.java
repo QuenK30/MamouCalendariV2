@@ -1,12 +1,7 @@
 package fr.qmn.mamoucalendari.tasks;
 
-import fr.qmn.mamoucalendari.utils.SoundLib;
-import fr.qmn.mamoucalendari.utils.TimeLib;
-
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class TasksSelect {
@@ -120,7 +115,5 @@ public class TasksSelect {
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
         }
-        SoundLib soundLib = new SoundLib();
-        soundLib.playSound("src/main/resources/fr/qmn/mamoucalendari/sounds/done.wav");
     }
 }

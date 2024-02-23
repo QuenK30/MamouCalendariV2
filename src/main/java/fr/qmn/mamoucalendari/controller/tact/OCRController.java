@@ -5,38 +5,35 @@ import fr.qmn.mamoucalendari.ocr.InitOCR;
 import fr.qmn.mamoucalendari.utils.TimeLib;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
-import javafx.stage.Popup;
-import javafx.util.StringConverter;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.Year;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Locale;
 
 public class OCRController {
     @FXML
@@ -90,6 +87,10 @@ public class OCRController {
         this.dateConverted = dateConverted;
     }
 
+    private void beforeCanvas() {
+        //canvas dimensions: 750.0 x 1704.0
+    }
+
     private void setTextDayButton() {
         String date = textActualDay.getText();
         String[] dateSplit = date.split(" ");
@@ -129,7 +130,6 @@ public class OCRController {
 
     public void onValidate() {
         buttonCheck.setOnAction(actionEvent -> {
-            System.out.println("Validate");
             Popup popup = new Popup();
             TimeLib timeLib = new TimeLib();
             if(hoursSelected == null || minutesSelected == null){
@@ -208,7 +208,6 @@ public class OCRController {
         buttonYes.setPrefHeight(50);
         buttonYes.setOnAction(actionEvent -> {
             popup.hide();
-            //TODO: add entry to database
             sqlManager.createTask(date, hours, minutes, text, false);
             System.out.println("Yes");
             ((Node) (actionEvent.getSource())).getScene().getWindow().hide();
@@ -221,7 +220,7 @@ public class OCRController {
                 stage.setScene(new Scene(root));
                 stage.show();
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("Error: " + e);
             }
         });
 
@@ -299,7 +298,7 @@ public class OCRController {
                 stage.setScene(new Scene(root));
                 stage.show();
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("Error: " + e);
             }
         });
     }
@@ -368,23 +367,19 @@ public class OCRController {
             double scrollY = event.getDeltaY();
             int newIndex = ListMinutes.getSelectionModel().getSelectedIndex();
 
-            // Scroll vers le haut
             if (scrollY < 0) {
                 newIndex--;
             }
-            // Scroll vers le bas
             else if (scrollY > 0) {
                 newIndex++;
             }
 
-            // Vérifier les bornes de la liste
             newIndex = Math.min(Math.max(newIndex, 0), minutes.size() - 1);
 
             ListMinutes.getSelectionModel().select(newIndex);
             ListMinutes.scrollTo(newIndex);
         });
 
-        // Sélectionner l'heure actuelle
         int currentMinute = LocalTime.now().getMinute();
         ListHours.getSelectionModel().select(currentMinute);
         ListHours.scrollTo(currentMinute);
@@ -394,7 +389,6 @@ public class OCRController {
         int currentMinutes = ListMinutes.getSelectionModel().getSelectedIndex();
         ListMinutes.scrollTo(currentMinutes);
         ListMinutes.getSelectionModel().select(currentMinutes);
-        //get text from list and set it to minutesSelected variable
         minutesSelected = ListMinutes.getSelectionModel().getSelectedItem().toString();
         System.out.println(minutesSelected);
     }

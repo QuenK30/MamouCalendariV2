@@ -16,9 +16,4 @@ public class SoundLib {
             throw new RuntimeException(e);
         }
     }
-
-    public void testSound() {
-        playSound("src/main/resources/fr/qmn/mamoucalendari/sounds/TaskAdded.wav");
-        System.out.println("Sound played");
-    }
 }

@@ -1,11 +1,9 @@
 package fr.qmn.mamoucalendari.controller.calendar;
 
 import fr.qmn.mamoucalendari.controller.tact.OCRController;
-import fr.qmn.mamoucalendari.utils.SoundLib;
 import fr.qmn.mamoucalendari.utils.TimeLib;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -63,13 +61,11 @@ public class CalendarController {
                     textActualMonth.setText(months[month]);
                     if (month == 11) { // if the month is December
                         buttonNextMonth.setText(months[0]);
-                        year = String.valueOf(Integer.parseInt(year) + 1);
                     } else {
                         buttonNextMonth.setText(months[month + 1]);
                     }
                     if (month == 0) { // if the month is January
                         buttonPreviousMonth.setText(months[11]);
-                        year = String.valueOf(Integer.parseInt(year) - 1);
                     } else {
                         buttonPreviousMonth.setText(months[month - 1]);
                     }
@@ -112,7 +108,14 @@ public class CalendarController {
                                     rectangles[j].setFill(Color.rgb(158, 158, 158));
                                     rectangles[j].setStroke(Color.web("#ff9d9d"));
                                     rectangles[j].setStrokeWidth(6);
-                                    beforeMonth = months[month - 1];
+                                    switch (month) {
+                                        case 0 -> beforeMonth = months[month + 1];
+                                        case 11 -> beforeMonth = months[month - 1];
+                                        default -> {
+                                            beforeMonth = months[month - 1];
+                                            afterMonth = months[month + 1];
+                                        }
+                                    }
                                 }
                             } else if (i >= daysInMonth) { // days after the month
                                 buttons[i].setText(String.valueOf(i - daysInMonth - firstDay + 1));
@@ -160,8 +163,6 @@ public class CalendarController {
                 System.out.println(date);
                 System.out.println(realDate);
                 String convertDate = timeLib.convertDate(realDate); // 2021-01-01
-                SoundLib soundLib = new SoundLib();
-                soundLib.testSound();
                 //open ocr window
                 ((Node) (actionEvent.getSource())).getScene().getWindow().hide();
                 try {

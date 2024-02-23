@@ -32,7 +32,7 @@ public class InitOCR {
 
             int exitCode = p.waitFor();
             System.out.println("Exited with error code : " + exitCode);
-
+            System.out.println(output);
             if (exitCode == 0 && !isError) {
                 String result = output.toString();
                 int start = result.indexOf("<");
@@ -41,6 +41,7 @@ public class InitOCR {
             } else {
                 return "Error in OCR Process: " + output;
             }
+
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Exception occurred in OCR process: " + e.getMessage(), e);
         }

@@ -3,6 +3,7 @@ package fr.qmn.mamoucalendari;
 import fr.qmn.mamoucalendari.bdd.SQLInit;
 import fr.qmn.mamoucalendari.bdd.SQLManager;
 import fr.qmn.mamoucalendari.tasks.Tasks;
+import fr.qmn.mamoucalendari.tasks.TasksReminder;
 import fr.qmn.mamoucalendari.tasks.TasksSelect;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -42,6 +43,8 @@ public class MCMain extends Application {
         SQLInit sqlInit = new SQLInit();
         SQLManager sqlManager = new SQLManager();
         TasksSelect tasksSelect = new TasksSelect();
+        TasksReminder tasksReminder = new TasksReminder();
+        tasksReminder.startReminder();
         sqlInit.createNewDatabase();
         /*
         sqlManager.createTask("2023-12-16", 22, 0, "Test1", false);

@@ -49,14 +49,9 @@ public class VisualController {
 
         updateTaskUI(textBeforeHours, textBeforeTasks, closestTask[0]);
 
-        // Use the next task as the current task if the actual task is null
+
         Tasks currentTask = closestTask[1] != null ? closestTask[1] : closestTask[2];
         updateTaskUI(textActualHours, textActualTasks, currentTask);
-        SoundLib soundLib = new SoundLib();
-        if (currentTask != null) {
-            soundLib.playSound("src/main/resources/fr/qmn/mamoucalendari/sounds/ding.wav");
-        }
-
         if (closestTask[2] == currentTask) {
             updateTaskUI(textAfterHours, textAfterTasks, null);
         }else {
@@ -92,5 +87,7 @@ public class VisualController {
         }
     }
 
-    //TODO: task reminder -> 30 minutes before | 15 minutes before | 5 minutes before | 1 minute before | 0 minute before
+    //TODO: task reminder -> 30 minutes before | 15 minutes before | 5 minutes before | 1 minute before | 30 seconds before | 15 seconds before | 5 seconds before | 1 second before
+
+
 }
