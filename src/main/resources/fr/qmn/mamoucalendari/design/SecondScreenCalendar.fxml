@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Point3D?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/20.0.1"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.qmn.mamoucalendari.controller.calendar.CalendarController"
+            stylesheets="@../css/calendar.css"  fx:id="calendar">
+   <rotationAxis>
+      <Point3D />
+   </rotationAxis>
+   <children>
+      <Rectangle fx:id="rectSelectMonth" fill="#ffd9d8" height="100.0" stroke="#ff9d9d" strokeType="INSIDE" strokeWidth="2.0" width="1920.0">
+         <rotationAxis>
+            <Point3D />
+         </rotationAxis>
+      </Rectangle>
+      <Button fx:id="buttonPreviousMonth" layoutX="67.0" layoutY="27.0" mnemonicParsing="false" prefHeight="59.0" prefWidth="200.0" text="Button">
+         <font>
+            <Font size="27.0" />
+         </font>
+      </Button>
+      <Text fx:id="textActualMonth" layoutX="941.0" layoutY="65.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text">
+         <font>
+            <Font size="21.0" />
+         </font>
+      </Text>
+      <Button fx:id="buttonNextMonth" layoutX="1635.0" layoutY="27.0" mnemonicParsing="false" prefHeight="59.0" prefWidth="200.0" text="Button">
+         <font>
+            <Font size="27.0" />
+         </font>
+      </Button>
+      <Rectangle fill="#ffd9d8" height="50.0" layoutX="1.0" layoutY="106.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="270.0" />
+      <Rectangle fill="#ffd9d8" height="50.0" layoutX="275.0" layoutY="106.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="270.0" />
+      <Rectangle fill="#ffd9d8" height="50.0" layoutX="549.0" layoutY="106.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="270.0" />
+      <Rectangle fill="#ffd9d8" height="50.0" layoutX="823.0" layoutY="106.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="270.0" />
+      <Rectangle fill="#ffd9d8" height="50.0" layoutX="1098.0" layoutY="106.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="270.0" />
+      <Rectangle fill="#ffd9d8" height="50.0" layoutX="1371.0" layoutY="106.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="270.0" />
+      <Rectangle fill="#ffd9d8" height="50.0" layoutX="1643.0" layoutY="106.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="276.0" />
+      <Rectangle fx:id="rect1" fill="WHITE" height="150.0" layoutX="1.0" layoutY="168.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect8" fill="WHITE" height="150.0" layoutX="1.0" layoutY="328.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect15" fill="WHITE" height="150.0" layoutX="1.0" layoutY="488.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect22" fill="WHITE" height="150.0" layoutX="1.0" layoutY="648.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect2" fill="WHITE" height="150.0" layoutX="275.0" layoutY="168.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect3" fill="WHITE" height="150.0" layoutX="549.0" layoutY="168.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect4" fill="WHITE" height="150.0" layoutX="823.0" layoutY="168.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect5" fill="WHITE" height="150.0" layoutX="1097.0" layoutY="168.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect7" fill="WHITE" height="150.0" layoutX="1645.0" layoutY="168.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="270.0" />
+      <Rectangle fx:id="rect6" fill="WHITE" height="150.0" layoutX="1371.0" layoutY="168.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect29" fill="WHITE" height="150.0" layoutX="1.0" layoutY="808.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect9" fill="WHITE" height="150.0" layoutX="275.0" layoutY="328.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect10" fill="WHITE" height="150.0" layoutX="549.0" layoutY="328.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect11" fill="WHITE" height="150.0" layoutX="823.0" layoutY="328.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect12" fill="WHITE" height="150.0" layoutX="1097.0" layoutY="328.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect13" fill="WHITE" height="150.0" layoutX="1371.0" layoutY="328.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect14" fill="WHITE" height="150.0" layoutX="1645.0" layoutY="328.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="270.0" />
+      <Rectangle fx:id="rect16" fill="WHITE" height="150.0" layoutX="275.0" layoutY="488.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect17" fill="WHITE" height="150.0" layoutX="549.0" layoutY="488.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect18" fill="WHITE" height="150.0" layoutX="823.0" layoutY="488.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect19" fill="WHITE" height="150.0" layoutX="1097.0" layoutY="488.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect20" fill="WHITE" height="150.0" layoutX="1371.0" layoutY="488.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect21" fill="WHITE" height="150.0" layoutX="1645.0" layoutY="488.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="270.0" />
+      <Rectangle fx:id="rect23" fill="WHITE" height="150.0" layoutX="275.0" layoutY="648.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect24" fill="WHITE" height="150.0" layoutX="549.0" layoutY="648.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect25" fill="WHITE" height="150.0" layoutX="823.0" layoutY="648.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect26" fill="WHITE" height="150.0" layoutX="1097.0" layoutY="648.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect27" fill="WHITE" height="150.0" layoutX="1370.0" layoutY="648.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect28" fill="WHITE" height="150.0" layoutX="1645.0" layoutY="648.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="270.0" />
+      <Rectangle fx:id="rect30" fill="WHITE" height="150.0" layoutX="275.0" layoutY="808.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect31" fill="WHITE" height="150.0" layoutX="549.0" layoutY="808.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect32" fill="WHITE" height="150.0" layoutX="823.0" layoutY="808.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect33" fill="WHITE" height="150.0" layoutX="1097.0" layoutY="808.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect34" fill="WHITE" height="150.0" layoutX="1370.0" layoutY="808.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="268.0" />
+      <Rectangle fx:id="rect35" fill="WHITE" height="150.0" layoutX="1645.0" layoutY="808.0" stroke="#ff9d9d" strokeType="OUTSIDE" strokeWidth="6.0" width="270.0" />
+      <Text fx:id="textDayMonday" layoutX="3.0" layoutY="136.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lundi" wrappingWidth="264.8033752441406" />
+      <Text fx:id="textDayTuesday" layoutX="287.0" layoutY="136.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Mardi" wrappingWidth="264.8033752441406" />
+      <Text fx:id="textDayWednesday" layoutX="560.0" layoutY="136.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Mercredi" wrappingWidth="264.8033752441406" />
+      <Text fx:id="textDayThursday" layoutX="827.0" layoutY="136.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Jeudi" wrappingWidth="264.8033752441406" />
+      <Text fx:id="textDayFriday" layoutX="1102.0" layoutY="136.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Vendredi" wrappingWidth="264.8033752441406" />
+      <Text fx:id="textDaySaturday" layoutX="1371.0" layoutY="136.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Samedi" wrappingWidth="264.8033752441406" />
+      <Text fx:id="textDaySunday" layoutX="1647.0" layoutY="136.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Dimanche" wrappingWidth="264.8033752441406" />
+      <Button fx:id="j1" layoutX="1.0" layoutY="169.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j2" layoutX="275.0" layoutY="169.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j3" layoutX="549.0" layoutY="169.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j4" layoutX="823.0" layoutY="169.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j5" layoutX="1098.0" layoutY="169.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j6" layoutX="1372.0" layoutY="169.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j7" layoutX="1646.0" layoutY="168.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j8" layoutX="3.0" layoutY="329.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j9" layoutX="277.0" layoutY="329.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j10" layoutX="550.0" layoutY="329.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j11" layoutX="823.0" layoutY="329.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j12" layoutX="1099.0" layoutY="329.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j13" layoutX="1372.0" layoutY="329.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j14" layoutX="1645.0" layoutY="329.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j15" layoutX="3.0" layoutY="488.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j16" layoutX="275.0" layoutY="488.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j17" layoutX="549.0" layoutY="488.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j18" layoutX="823.0" layoutY="488.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j19" layoutX="1097.0" layoutY="488.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j20" layoutX="1369.0" layoutY="488.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j21" layoutX="1645.0" layoutY="488.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j22" layoutX="1.0" layoutY="647.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j23" layoutX="276.0" layoutY="647.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j24" layoutX="549.0" layoutY="647.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j25" layoutX="823.0" layoutY="647.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j26" layoutX="1097.0" layoutY="647.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j27" layoutX="1372.0" layoutY="647.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j28" layoutX="1647.0" layoutY="647.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j29" layoutX="3.0" layoutY="808.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j30" layoutX="275.0" layoutY="808.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j31" layoutX="549.0" layoutY="808.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j32" layoutX="823.0" layoutY="808.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j33" layoutX="1097.0" layoutY="808.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j34" layoutX="1369.0" layoutY="808.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Button fx:id="j35" layoutX="1647.0" layoutY="808.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="268.0" text="Button" />
+      <Rectangle fx:id="rect36" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="122.0" layoutX="-3.0" layoutY="961.0" stroke="#ff9d9d" strokeType="INSIDE" strokeWidth="6.0" width="280.0" />
+      <Rectangle fx:id="rect37" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="122.0" layoutX="270.0" layoutY="961.0" stroke="#ff9d9d" strokeType="INSIDE" strokeWidth="6.0" width="280.0" />
+      <Rectangle fx:id="rect38" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="122.0" layoutX="544.0" layoutY="961.0" stroke="#ff9d9d" strokeType="INSIDE" strokeWidth="6.0" width="280.0" />
+      <Rectangle fx:id="rect39" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="122.0" layoutX="817.0" layoutY="961.0" stroke="#ff9d9d" strokeType="INSIDE" strokeWidth="6.0" width="280.0" />
+      <Rectangle fx:id="rect40" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="122.0" layoutX="1094.0" layoutY="961.0" stroke="#ff9d9d" strokeType="INSIDE" strokeWidth="6.0" width="280.0" />
+      <Rectangle fx:id="rect41" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="122.0" layoutX="1374.0" layoutY="961.0" stroke="#ff9d9d" strokeType="INSIDE" strokeWidth="6.0" width="280.0" />
+      <Rectangle fx:id="rect42" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="122.0" layoutX="1640.0" layoutY="961.0" stroke="#ff9d9d" strokeType="INSIDE" strokeWidth="6.0" width="280.0" />
+      <Button fx:id="j36" layoutX="5.0" layoutY="965.0" mnemonicParsing="false" prefHeight="112.0" prefWidth="265.0" text="Button" />
+      <Button fx:id="j37" layoutX="277.0" layoutY="967.0" mnemonicParsing="false" prefHeight="112.0" prefWidth="265.0" text="Button" />
+      <Button fx:id="j38" layoutX="551.0" layoutY="967.0" mnemonicParsing="false" prefHeight="112.0" prefWidth="265.0" text="Button" />
+      <Button fx:id="j39" layoutX="825.0" layoutY="967.0" mnemonicParsing="false" prefHeight="112.0" prefWidth="265.0" text="Button" />
+      <Button fx:id="j40" layoutX="1102.0" layoutY="965.0" mnemonicParsing="false" prefHeight="112.0" prefWidth="265.0" text="Button" />
+      <Button fx:id="j41" layoutX="1374.0" layoutY="965.0" mnemonicParsing="false" prefHeight="112.0" prefWidth="265.0" text="Button" />
+      <Button fx:id="j42" layoutX="1647.0" layoutY="966.0" mnemonicParsing="false" prefHeight="112.0" prefWidth="265.0" text="Button" />
+   </children>
+</AnchorPane>
