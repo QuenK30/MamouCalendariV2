@@ -3,17 +3,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-pom.xml
-mvnw
-mvnw.cmd
-src/main/resources/fr/qmn/mamoucalendari/bdd/
-src/main/resources/fr/qmn/mamoucalendari/ocr/
-MamouCalendariV2.iml
-src/main/resources/fr/qmn/mamoucalendari/sounds/
+
 ### resources ###
 !**/src/main/**/resources/fr/qmn/mamoucalendari/bdd/UserRegistre.db
-!**/src/test/**/resources/fr/qmn/mamoucalendari/css/
-!**/src/test/**/resources/fr/qmn/mamoucalendari/font/
 
 
 ### IntelliJ IDEA ###

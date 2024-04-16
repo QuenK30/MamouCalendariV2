@@ -2,7 +2,6 @@ package fr.qmn.mamoucalendari.controller.visual;
 
 import fr.qmn.mamoucalendari.tasks.Tasks;
 import fr.qmn.mamoucalendari.tasks.TasksSelect;
-import fr.qmn.mamoucalendari.utils.SoundLib;
 import fr.qmn.mamoucalendari.utils.StringLib;
 import fr.qmn.mamoucalendari.utils.TimeLib;
 import javafx.animation.KeyFrame;
