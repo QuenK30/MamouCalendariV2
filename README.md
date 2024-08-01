@@ -1,6 +1,6 @@
 # MamouCalendari - Task Manager for Seniors
 
-#EN
+# EN
 # Overview
 Welcome to MamouCalendari, a comprehensive task manager designed to empower seniors by leveraging digital technology. 
 This project focuses on enhancing the autonomy of elderly individuals through a user-friendly interface, incorporating OCR capabilities, and utilizing Java, JavaFX, SQLite, and CSS.
