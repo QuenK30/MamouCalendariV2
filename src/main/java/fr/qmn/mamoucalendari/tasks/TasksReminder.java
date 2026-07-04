@@ -38,23 +38,14 @@ public class TasksReminder {
 
     public void loadTasksFromDB() {
         String sql = "SELECT * FROM USERS";
-        try {
-            Class.forName("org.sqlite.JDBC");
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:src/main/resources/fr/qmn/mamoucalendari/bdd/UserRegistre.db");
-                 PreparedStatement pstmt = connection.prepareStatement(sql);
-                 ResultSet rs = pstmt.executeQuery()) {
-
-                if(tasksList != null)
-                    tasksList.clear();
-                else
-                    tasksList = new ArrayList<>();
-
-                while (rs.next()) {
-                    Tasks task = new Tasks(rs.getString("DATE"), rs.getInt("HOURS"), rs.getInt("MINUTES"), rs.getString("TASKS"), rs.getBoolean("ISDONE"));
-                    tasksList.add(task);
-                }
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:src/main/resources/fr/qmn/mamoucalendari/bdd/UserRegistre.db");
+             PreparedStatement pstmt = connection.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            tasksList.clear();
+            while (rs.next()) {
+                tasksList.add(new Tasks(rs.getString("DATE"), rs.getInt("HOURS"), rs.getInt("MINUTES"), rs.getString("TASKS"), rs.getBoolean("ISDONE")));
             }
-            System.out.println("Tasks loaded with "+ tasksList.size() + " tasks");
+            System.out.println("Tasks loaded with " + tasksList.size() + " tasks");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

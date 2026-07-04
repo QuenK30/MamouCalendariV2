@@ -380,9 +380,9 @@ public class OCRController {
             ListMinutes.scrollTo(newIndex);
         });
 
-        int currentMinute = LocalTime.now().getMinute();
-        ListHours.getSelectionModel().select(currentMinute);
-        ListHours.scrollTo(currentMinute);
+        int currentMinute = LocalTime.now().getMinute() / 5;
+        ListMinutes.getSelectionModel().select(currentMinute);
+        ListMinutes.scrollTo(currentMinute);
     }
 
     public void onListMinutesViewReleased(MouseEvent mouseEvent) {

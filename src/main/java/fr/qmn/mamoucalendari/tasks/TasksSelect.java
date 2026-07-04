@@ -8,16 +8,13 @@ public class TasksSelect {
 
     public List<Tasks> getAllTasksByDate(String date) {
         ArrayList<Tasks> tasksList = new ArrayList<>();
-        int countTasks = 0;
-        try {
-            Class.forName("org.sqlite.JDBC");
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/main/resources/fr/qmn/mamoucalendari/bdd/UserRegistre.db");
-            if (connection != null) {
-                ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM USERS WHERE DATE = '" + date + "'");
+        String sql = "SELECT * FROM USERS WHERE DATE = ?";
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:src/main/resources/fr/qmn/mamoucalendari/bdd/UserRegistre.db");
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, date);
+            try (ResultSet resultSet = pstmt.executeQuery()) {
                 while (resultSet.next()) {
-                    Tasks tasks = new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"), false);
-                    tasksList.add(tasks);
-                    countTasks++;
+                    tasksList.add(new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"), false));
                 }
             }
         } catch (Exception e) {
@@ -29,14 +26,13 @@ public class TasksSelect {
     public List<Tasks> getTasksbyDate(String date)
     {
         List<Tasks> tasksList = new ArrayList<>();
-        try {
-            Class.forName("org.sqlite.JDBC");
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/main/resources/fr/qmn/mamoucalendari/bdd/UserRegistre.db");
-            if (connection != null) {
-                ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM USERS WHERE DATE = '" + date + "'");
+        String sql = "SELECT * FROM USERS WHERE DATE = ?";
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:src/main/resources/fr/qmn/mamoucalendari/bdd/UserRegistre.db");
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, date);
+            try (ResultSet resultSet = pstmt.executeQuery()) {
                 while (resultSet.next()) {
-                    Tasks tasks = new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"), resultSet.getBoolean("ISDONE"));
-                    tasksList.add(tasks);
+                    tasksList.add(new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"), resultSet.getBoolean("ISDONE")));
                 }
             }
         } catch (Exception e) {
@@ -48,14 +44,14 @@ public class TasksSelect {
     public List<Tasks> getTasksbyDateAndHours(String date, int hours)
     {
         List<Tasks> tasksList = new ArrayList<>();
-        try {
-            Class.forName("org.sqlite.JDBC");
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:src/main/resources/fr/qmn/mamoucalendari/bdd/UserRegistre.db");
-            if (connection != null) {
-                ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM USERS WHERE DATE = '" + date + "' AND HOURS = '" + hours + "'");
+        String sql = "SELECT * FROM USERS WHERE DATE = ? AND HOURS = ?";
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:src/main/resources/fr/qmn/mamoucalendari/bdd/UserRegistre.db");
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, date);
+            pstmt.setInt(2, hours);
+            try (ResultSet resultSet = pstmt.executeQuery()) {
                 while (resultSet.next()) {
-                    Tasks tasks = new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"), resultSet.getBoolean("ISDONE"));
-                    tasksList.add(tasks);
+                    tasksList.add(new Tasks(resultSet.getString("DATE"), resultSet.getInt("HOURS"), resultSet.getInt("MINUTES"), resultSet.getString("TASKS"), resultSet.getBoolean("ISDONE")));
                 }
             }
         } catch (Exception e) {
