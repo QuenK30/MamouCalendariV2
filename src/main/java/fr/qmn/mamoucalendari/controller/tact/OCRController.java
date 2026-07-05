@@ -1,81 +1,61 @@
 package fr.qmn.mamoucalendari.controller.tact;
 
-import fr.qmn.mamoucalendari.MCMain;
 import fr.qmn.mamoucalendari.bdd.SQLManager;
-import fr.qmn.mamoucalendari.ocr.HandwritingRecognizer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.image.WritableImage;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalTime;
 
 public class OCRController {
-    @FXML
-    public Text textActualDay;
-    @FXML
-    public Button buttonPrevDay;
-    @FXML
-    public Button buttonNextDay;
-    @FXML
-    public Canvas canvasOCR;
-    @FXML
-    public Button buttonCancel;
-    @FXML
-    public Button buttonCheck;
-    @FXML
-    public AnchorPane ocrFxml;
-    @FXML
-    public ListView ListHours;
-    @FXML
-    public ListView ListMinutes;
-    @FXML
-    private GraphicsContext graphicsContext;
+    @FXML public Text textActualDay;
+    @FXML public Button buttonPrevDay;
+    @FXML public Button buttonNextDay;
+    @FXML public Button buttonCancel;
+    @FXML public Button buttonCheck;
+    @FXML public AnchorPane ocrFxml;
+    @FXML public ListView ListHours;
+    @FXML public ListView ListMinutes;
+    @FXML private TextField textInput;
+    @FXML private AnchorPane keyboardPane;
+
     private double startY;
     private int startIndex;
-    private String hoursSelected = null;
+    private String hoursSelected   = null;
     private String minutesSelected = null;
     private String dateConverted;
-    private HandwritingRecognizer recognizer;
 
     public void initialize() {
-        ocrFxml.getStylesheets().add(getClass().getResource("/fr/qmn/mamoucalendari/css/ocr.css").toExternalForm());
-        // Récupère le recognizer créé une seule fois dans MCMain
-        recognizer = MCMain.getRecognizer();
+        ocrFxml.getStylesheets().add(
+            getClass().getResource("/fr/qmn/mamoucalendari/css/ocr.css").toExternalForm());
         onPressedButtonCancel();
         onValidate();
         setHoursOnList();
         setMinutesOnList();
-
-        graphicsContext = canvasOCR.getGraphicsContext2D();
-        graphicsContext.setStroke(Color.BLACK);
-        graphicsContext.setLineWidth(3);
+        buildKeyboard();
     }
 
     public void setTextActualDay(String date, String dateConverted) {
@@ -83,58 +63,30 @@ public class OCRController {
             System.out.println("textActualDay is null");
             return;
         }
-        Font font = Font.loadFont(getClass().getResourceAsStream("/fr/qmn/mamoucalendari/font/Ubuntu-Bold.ttf"), 32);
+        Font font = Font.loadFont(
+            getClass().getResourceAsStream("/fr/qmn/mamoucalendari/font/Ubuntu-Bold.ttf"), 32);
         textActualDay.setFont(font);
         textActualDay.setText(date);
         setTextDayButton();
         this.dateConverted = dateConverted;
     }
 
-    private void beforeCanvas() {
-        //canvas dimensions: 750.0 x 1704.0
-    }
-
     private void setTextDayButton() {
-        String date = textActualDay.getText();
-        String[] dateSplit = date.split(" ");
-        String day = dateSplit[0];
-
-        switch (day){
-            case "Lundi":
-                buttonPrevDay.setText("Dimanche");
-                buttonNextDay.setText("Mardi");
-                break;
-            case "Mardi":
-                buttonPrevDay.setText("Lundi");
-                buttonNextDay.setText("Mercredi");
-                break;
-            case "Mercredi":
-                buttonPrevDay.setText("Mardi");
-                buttonNextDay.setText("Jeudi");
-                break;
-            case "Jeudi":
-                buttonPrevDay.setText("Mercredi");
-                buttonNextDay.setText("Vendredi");
-                break;
-            case "Vendredi":
-                buttonPrevDay.setText("Jeudi");
-                buttonNextDay.setText("Samedi");
-                break;
-            case "Samedi":
-                buttonPrevDay.setText("Vendredi");
-                buttonNextDay.setText("Dimanche");
-                break;
-            case "Dimanche":
-                buttonPrevDay.setText("Samedi");
-                buttonNextDay.setText("Lundi");
-                break;
+        String day = textActualDay.getText().split(" ")[0];
+        switch (day) {
+            case "Lundi":    buttonPrevDay.setText("Dimanche"); buttonNextDay.setText("Mardi");    break;
+            case "Mardi":    buttonPrevDay.setText("Lundi");    buttonNextDay.setText("Mercredi"); break;
+            case "Mercredi": buttonPrevDay.setText("Mardi");    buttonNextDay.setText("Jeudi");    break;
+            case "Jeudi":    buttonPrevDay.setText("Mercredi"); buttonNextDay.setText("Vendredi"); break;
+            case "Vendredi": buttonPrevDay.setText("Jeudi");    buttonNextDay.setText("Samedi");   break;
+            case "Samedi":   buttonPrevDay.setText("Vendredi"); buttonNextDay.setText("Dimanche"); break;
+            case "Dimanche": buttonPrevDay.setText("Samedi");   buttonNextDay.setText("Lundi");    break;
         }
     }
 
     public void onValidate() {
         buttonCheck.setOnAction(actionEvent -> {
             if (hoursSelected == null || minutesSelected == null) {
-                System.out.println("hoursSelected or minutesSelected is null");
                 Popup popup = new Popup();
                 VBox vBox = new VBox();
                 vBox.setStyle("-fx-background-color: #ffd9d8");
@@ -142,51 +94,32 @@ public class OCRController {
                 vBox.setPrefHeight(400);
                 vBox.setAlignment(Pos.CENTER);
                 vBox.setSpacing(20);
-
-                Label label = new Label("Erreur, veuillez sélectionner une heure et une minute \n avant de valider la tâche.");
+                Label label = new Label(
+                    "Erreur, veuillez sélectionner une heure et une minute \n avant de valider la tâche.");
                 label.setStyle("-fx-font-size: 20px");
-
                 Button buttonOk = new Button("Ok");
                 buttonOk.setStyle("-fx-background-color: #00ff00");
                 buttonOk.setPrefWidth(100);
                 buttonOk.setPrefHeight(50);
-                buttonOk.setOnAction(actionEvent1 -> popup.hide());
-
+                buttonOk.setOnAction(e -> popup.hide());
                 vBox.getChildren().addAll(label, buttonOk);
                 popup.getContent().add(vBox);
                 popup.show(ocrFxml.getScene().getWindow());
                 return;
             }
-            try {
-                captureAndRecognize(canvasOCR);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            checkIfEntryIsCorrect(
+                textInput.getText().trim(),
+                dateConverted,
+                Integer.parseInt(hoursSelected),
+                Integer.parseInt(minutesSelected)
+            );
         });
     }
 
-    /**
-     * Capture le contenu du canvas et lance la reconnaissance ONNX locale.
-     *
-     * L'image reste en mémoire (BufferedImage) : plus d'écriture sur disque,
-     * plus de dépendance à un processus Python ou à un appel réseau.
-     */
-    private void captureAndRecognize(Canvas canvas) throws IOException {
-        WritableImage writableImage = new WritableImage((int) canvas.getWidth(), (int) canvas.getHeight());
-        SnapshotParameters parameters = new SnapshotParameters();
-        parameters.setFill(Color.WHITE);
-        canvas.snapshot(parameters, writableImage);
-
-        // Conversion en BufferedImage en mémoire (sans passer par le disque)
-        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(writableImage, null);
-        File test = new File("test.png");
-        ImageIO.write(bufferedImage, "png", test);
-
-        String result = (recognizer != null) ? recognizer.recognize(bufferedImage) : "";
-        checkIfEntryIsCorrect(result, dateConverted, Integer.parseInt(hoursSelected), Integer.parseInt(minutesSelected));
-    }
-
     public void checkIfEntryIsCorrect(String text, String date, int hours, int minutes) {
+        // Capturer le Stage avant de créer le Popup — dans le handler du Popup,
+        // getSource().getScene().getWindow() retourne la PopupWindow, pas le Stage.
+        Stage tactStage = (Stage) ocrFxml.getScene().getWindow();
         Popup popup = new Popup();
         SQLManager sqlManager = new SQLManager();
 
@@ -197,7 +130,7 @@ public class OCRController {
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(20);
 
-        Label label = new Label("Voulez-vous valider cette tâches ?");
+        Label label  = new Label("Voulez-vous valider cette tâche ?");
         label.setStyle("-fx-font-size: 20px");
 
         Label result = new Label(date + " à " + hours + "h" + minutes + "m\n" + text);
@@ -210,19 +143,12 @@ public class OCRController {
         buttonYes.setPrefHeight(50);
         buttonYes.setOnAction(actionEvent -> {
             popup.hide();
-            sqlManager.createTask(date, hours, minutes, text, false);
-            System.out.println("Yes");
-            ((Node) (actionEvent.getSource())).getScene().getWindow().hide();
             try {
-                InputStream fxmlStream = getClass().getResourceAsStream("/fr/qmn/mamoucalendari/design/SecondScreenCalendar.fxml");
-                FXMLLoader loader = new FXMLLoader();
-                Parent root = loader.load(fxmlStream);
-
-                Stage stage = new Stage();
-                stage.setScene(new Scene(root));
-                stage.show();
+                sqlManager.createTask(date, hours, minutes, text, false);
+                tactStage.close();
+                openCalendarScreen();
             } catch (Exception e) {
-                System.out.println("Error: " + e);
+                showError("Impossible d'enregistrer la tâche : " + e.getMessage());
             }
         });
 
@@ -232,186 +158,221 @@ public class OCRController {
         buttonNo.setPrefHeight(50);
         buttonNo.setOnAction(actionEvent -> {
             popup.hide();
-            clearCanvas();
-            System.out.println("No");
+            textInput.clear();
         });
 
-        vBox.getChildren().addAll(label,result, buttonYes, buttonNo);
+        vBox.getChildren().addAll(label, result, buttonYes, buttonNo);
         popup.getContent().add(vBox);
         popup.show(ocrFxml.getScene().getWindow());
     }
 
-    private void clearCanvas() {
-        graphicsContext.clearRect(0, 0, canvasOCR.getWidth(), canvasOCR.getHeight());
+    public void onPressedButtonCancel() {
+        buttonCancel.setOnAction(actionEvent -> {
+            Stage current = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            current.close();
+            try {
+                openCalendarScreen();
+            } catch (Exception e) {
+                showError("Impossible de revenir au calendrier : " + e.getMessage());
+            }
+        });
     }
-    public void onMouseDragged(MouseEvent mouseEvent) {
-        graphicsContext.lineTo(mouseEvent.getX(), mouseEvent.getY());
-        graphicsContext.stroke();
+
+    private void openCalendarScreen() throws Exception {
+        FXMLLoader loader = new FXMLLoader(
+            getClass().getResource("/fr/qmn/mamoucalendari/design/SecondScreenCalendar.fxml"));
+        Parent root = loader.load();
+        Stage stage = new Stage();
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.setScene(new Scene(root));
+        stage.setMaximized(true);
+        stage.show();
+    }
+
+    private void buildKeyboard() {
+        GridPane grid = new GridPane();
+        grid.setPrefSize(1704, 632);
+        grid.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        for (int i = 0; i < 10; i++) {
+            ColumnConstraints cc = new ColumnConstraints();
+            cc.setPercentWidth(10);
+            grid.getColumnConstraints().add(cc);
+        }
+        for (int i = 0; i < 5; i++) {
+            RowConstraints rc = new RowConstraints();
+            rc.setPercentHeight(20);
+            grid.getRowConstraints().add(rc);
+        }
+
+        String btnStyle = "-fx-font-size: 36px; -fx-background-color: #f0f0f0;" +
+                          " -fx-border-color: #ccc; -fx-border-width: 1;";
+
+        String[][] rows = {
+            {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"},
+            {"A", "Z", "E", "R", "T", "Y", "U", "I", "O", "P"},
+            {"Q", "S", "D", "F", "G", "H", "J", "K", "L", "M"},
+            {"W", "X", "C", "V", "B", "N", "É", "È", "À", "Ù"}
+        };
+
+        for (int row = 0; row < rows.length; row++) {
+            for (int col = 0; col < rows[row].length; col++) {
+                String ch = rows[row][col];
+                Button btn = new Button(ch);
+                btn.setStyle(btnStyle);
+                btn.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                btn.setOnAction(e -> appendChar(ch));
+                GridPane.setHgrow(btn, Priority.ALWAYS);
+                GridPane.setVgrow(btn, Priority.ALWAYS);
+                grid.add(btn, col, row);
+            }
+        }
+
+        Button btnSpace = new Button("ESPACE");
+        btnSpace.setStyle(btnStyle);
+        btnSpace.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        btnSpace.setOnAction(e -> appendChar(" "));
+        GridPane.setHgrow(btnSpace, Priority.ALWAYS);
+        GridPane.setVgrow(btnSpace, Priority.ALWAYS);
+        GridPane.setColumnSpan(btnSpace, 6);
+        grid.add(btnSpace, 0, 4);
+
+        String[] special = {"Ç", ".", ","};
+        for (int i = 0; i < special.length; i++) {
+            String ch = special[i];
+            Button btn = new Button(ch);
+            btn.setStyle(btnStyle);
+            btn.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            btn.setOnAction(e -> appendChar(ch));
+            GridPane.setHgrow(btn, Priority.ALWAYS);
+            GridPane.setVgrow(btn, Priority.ALWAYS);
+            grid.add(btn, 6 + i, 4);
+        }
+
+        Button btnBack = new Button("⌫");
+        btnBack.setStyle("-fx-font-size: 36px; -fx-background-color: #ff9d9d;" +
+                         " -fx-border-color: #ccc; -fx-border-width: 1;");
+        btnBack.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        btnBack.setOnAction(e -> backspace());
+        GridPane.setHgrow(btnBack, Priority.ALWAYS);
+        GridPane.setVgrow(btnBack, Priority.ALWAYS);
+        grid.add(btnBack, 9, 4);
+
+        AnchorPane.setTopAnchor(grid, 0.0);
+        AnchorPane.setBottomAnchor(grid, 0.0);
+        AnchorPane.setLeftAnchor(grid, 0.0);
+        AnchorPane.setRightAnchor(grid, 0.0);
+        keyboardPane.getChildren().add(grid);
+    }
+
+    private void appendChar(String c) { textInput.appendText(c); }
+
+    private void backspace() {
+        String t = textInput.getText();
+        if (!t.isEmpty()) textInput.setText(t.substring(0, t.length() - 1));
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     public void onListViewDragged(MouseEvent mouseEvent) {
         double endY = mouseEvent.getSceneY();
-        double deltaY = endY - startY;
-
-        int offset = (int) (deltaY / 50);
+        int offset = (int) ((endY - startY) / 50);
         int newHour = startIndex - offset;
-
         if (newHour < 0) newHour = 0;
         else if (newHour >= ListHours.getItems().size()) newHour = ListHours.getItems().size() - 1;
-
         ListHours.scrollTo(newHour);
         ListHours.getSelectionModel().select(newHour);
     }
 
-    public void onMouseRelease(MouseEvent mouseEvent) {
-        graphicsContext.lineTo(mouseEvent.getX(), mouseEvent.getY());
-        graphicsContext.stroke();
-        graphicsContext.closePath();
-    }
-
     public void onListViewReleased(MouseEvent mouseEvent) {
-        int currentHour = ListHours.getSelectionModel().getSelectedIndex();
-        ListHours.scrollTo(currentHour);
-        ListHours.getSelectionModel().select(currentHour);
+        int idx = ListHours.getSelectionModel().getSelectedIndex();
+        ListHours.scrollTo(idx);
+        ListHours.getSelectionModel().select(idx);
         hoursSelected = ListHours.getSelectionModel().getSelectedItem().toString();
-        System.out.println(hoursSelected);
     }
 
     public void onListViewClicked(MouseEvent mouseEvent) {
-        startY = mouseEvent.getSceneY();
+        startY     = mouseEvent.getSceneY();
         startIndex = ListHours.getSelectionModel().getSelectedIndex();
-    }
-
-    public void onMousePressed(MouseEvent mouseEvent) {
-        graphicsContext.beginPath();
-        graphicsContext.moveTo(mouseEvent.getX(), mouseEvent.getY());
-        graphicsContext.stroke();
-    }
-
-    public void onPressedButtonCancel() {
-        buttonCancel.setOnAction(actionEvent -> {
-            ((Node) (actionEvent.getSource())).getScene().getWindow().hide();
-            try {
-                InputStream fxmlStream = getClass().getResourceAsStream("/fr/qmn/mamoucalendari/design/SecondScreenCalendar.fxml");
-                FXMLLoader loader = new FXMLLoader();
-                Parent root = loader.load(fxmlStream);
-
-                Stage stage = new Stage();
-                stage.setScene(new Scene(root));
-                stage.show();
-            } catch (Exception e) {
-                System.out.println("Error: " + e);
-            }
-        });
     }
 
     public void setHoursOnList() {
         ObservableList<String> hours = FXCollections.observableArrayList();
-        for (int i = 0; i < 24; i++) {
-            hours.add(String.format("%02d", i));
-        }
+        for (int i = 0; i < 24; i++) hours.add(String.format("%02d", i));
         ListHours.setItems(hours);
-
         ListHours.setCellFactory(lv -> new ListCell<String>() {
-            @Override
-            public void updateItem(String item, boolean empty) {
+            @Override public void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty ? null : item);
                 setAlignment(Pos.CENTER);
             }
         });
-
         ListHours.setOnScroll(event -> {
-            double scrollY = event.getDeltaY();
             int newIndex = ListHours.getSelectionModel().getSelectedIndex();
-
-            // Scroll vers le haut
-            if (scrollY < 0) {
-                newIndex--;
-            }
-            // Scroll vers le bas
-            else if (scrollY > 0) {
-                newIndex++;
-            }
-
-            // Vérifier les bornes de la liste
+            if (event.getDeltaY() < 0) newIndex--;
+            else if (event.getDeltaY() > 0) newIndex++;
             newIndex = Math.min(Math.max(newIndex, 0), hours.size() - 1);
-
             ListHours.getSelectionModel().select(newIndex);
             ListHours.scrollTo(newIndex);
+            hoursSelected = hours.get(newIndex);
         });
-
-        // Sélectionner l'heure actuelle
         int currentHour = LocalTime.now().getHour();
         ListHours.getSelectionModel().select(currentHour);
         ListHours.scrollTo(currentHour);
+        hoursSelected = String.format("%02d", currentHour);
     }
 
     public void setMinutesOnList() {
         ObservableList<String> minutes = FXCollections.observableArrayList();
-
-        for (int i = 0; i < 60; i+=5) {
-            minutes.add(String.format("%02d", i));
-        }
-
+        for (int i = 0; i < 60; i += 5) minutes.add(String.format("%02d", i));
         ListMinutes.setItems(minutes);
-
         ListMinutes.setCellFactory(lv -> new ListCell<String>() {
-            @Override
-            public void updateItem(String item, boolean empty) {
+            @Override public void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty ? null : item);
                 setAlignment(Pos.CENTER);
             }
         });
-
         ListMinutes.setOnScroll(event -> {
-            double scrollY = event.getDeltaY();
             int newIndex = ListMinutes.getSelectionModel().getSelectedIndex();
-
-            if (scrollY < 0) {
-                newIndex--;
-            }
-            else if (scrollY > 0) {
-                newIndex++;
-            }
-
+            if (event.getDeltaY() < 0) newIndex--;
+            else if (event.getDeltaY() > 0) newIndex++;
             newIndex = Math.min(Math.max(newIndex, 0), minutes.size() - 1);
-
             ListMinutes.getSelectionModel().select(newIndex);
             ListMinutes.scrollTo(newIndex);
+            minutesSelected = minutes.get(newIndex);
         });
-
-        int currentMinute = LocalTime.now().getMinute() / 5;
-        ListMinutes.getSelectionModel().select(currentMinute);
-        ListMinutes.scrollTo(currentMinute);
+        int currentMinuteIdx = LocalTime.now().getMinute() / 5;
+        ListMinutes.getSelectionModel().select(currentMinuteIdx);
+        ListMinutes.scrollTo(currentMinuteIdx);
+        minutesSelected = String.format("%02d", currentMinuteIdx * 5);
     }
 
     public void onListMinutesViewReleased(MouseEvent mouseEvent) {
-        int currentMinutes = ListMinutes.getSelectionModel().getSelectedIndex();
-        ListMinutes.scrollTo(currentMinutes);
-        ListMinutes.getSelectionModel().select(currentMinutes);
+        int idx = ListMinutes.getSelectionModel().getSelectedIndex();
+        ListMinutes.scrollTo(idx);
+        ListMinutes.getSelectionModel().select(idx);
         minutesSelected = ListMinutes.getSelectionModel().getSelectedItem().toString();
-        System.out.println(minutesSelected);
     }
 
     public void onListinutesClicked(MouseEvent mouseEvent) {
-        startY = mouseEvent.getSceneY();
+        startY     = mouseEvent.getSceneY();
         startIndex = ListMinutes.getSelectionModel().getSelectedIndex();
     }
 
     public void onListMinutesDragged(MouseEvent mouseEvent) {
         double endY = mouseEvent.getSceneY();
-        double deltaY = endY - startY;
-
-        int offset = (int) (deltaY / 50);
+        int offset = (int) ((endY - startY) / 50);
         int newMinutes = startIndex - offset;
-
         if (newMinutes < 0) newMinutes = 0;
         else if (newMinutes >= ListMinutes.getItems().size()) newMinutes = ListMinutes.getItems().size() - 1;
-
         ListMinutes.scrollTo(newMinutes);
         ListMinutes.getSelectionModel().select(newMinutes);
     }
-
 }

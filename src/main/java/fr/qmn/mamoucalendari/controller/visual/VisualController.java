@@ -1,12 +1,16 @@
 package fr.qmn.mamoucalendari.controller.visual;
 
+import fr.qmn.mamoucalendari.MCMain;
 import fr.qmn.mamoucalendari.tasks.Tasks;
 import fr.qmn.mamoucalendari.tasks.TasksSelect;
 import fr.qmn.mamoucalendari.utils.StringLib;
 import fr.qmn.mamoucalendari.utils.TimeLib;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -22,7 +26,11 @@ public class VisualController {
     public Text textAfterTasks;
     public AnchorPane visualFxml;
 
+    private VBox reminderOverlay = null;
+
     public void initialize() {
+        MCMain.activeVisualController = this;
+
         Timeline timeline = new Timeline(
                 new KeyFrame(Duration.seconds(0), event -> {
                     updateDate();
@@ -33,6 +41,7 @@ public class VisualController {
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
+
     private void updateDate() {
         TimeLib timeLib = new TimeLib();
         StringLib stringLib = new StringLib();
@@ -45,17 +54,9 @@ public class VisualController {
 
     private void setTasks() {
         Tasks[] closestTask = getClosestTask();
-
         updateTaskUI(textBeforeHours, textBeforeTasks, closestTask[0]);
-
-
-        Tasks currentTask = closestTask[1] != null ? closestTask[1] : closestTask[2];
-        updateTaskUI(textActualHours, textActualTasks, currentTask);
-        if (closestTask[2] == currentTask) {
-            updateTaskUI(textAfterHours, textAfterTasks, null);
-        }else {
-            updateTaskUI(textAfterHours, textAfterTasks, closestTask[2]);
-        }
+        updateTaskUI(textActualHours, textActualTasks, closestTask[1]);
+        updateTaskUI(textAfterHours,  textAfterTasks,  closestTask[2]);
     }
 
     private Tasks[] getClosestTask() {
@@ -71,7 +72,6 @@ public class VisualController {
         int actualHoursTime = Integer.parseInt(timeParts[0]);
         int actualMinutesTime = Integer.parseInt(timeParts[1]);
 
-        // Get closest task by actual time
         return tasksSelect.getClosestTaskByTime(actualDate, actualHoursTime, actualMinutesTime);
     }
 
@@ -86,7 +86,41 @@ public class VisualController {
         }
     }
 
-    //TODO: task reminder -> 30 minutes before | 15 minutes before | 5 minutes before | 1 minute before | 30 seconds before | 15 seconds before | 5 seconds before | 1 second before
+    public void showReminderOverlay(Tasks task, int minutesBefore) {
+        hideReminderOverlay();
 
+        reminderOverlay = new VBox(16);
+        reminderOverlay.setAlignment(Pos.CENTER);
+        reminderOverlay.setStyle(
+            "-fx-background-color: #ffd9d8;" +
+            "-fx-border-color: #ff9d9d;" +
+            "-fx-border-width: 4;" +
+            "-fx-border-radius: 12;" +
+            "-fx-background-radius: 12;" +
+            "-fx-padding: 30;"
+        );
+        reminderOverlay.setPrefSize(760, 280);
 
+        String delayLabel = minutesBefore == 0 ? "Maintenant !" : "dans " + minutesBefore + " min";
+        Label title = new Label("Rappel  " + delayLabel);
+        title.setStyle("-fx-font-size: 34px; -fx-font-weight: bold;");
+
+        Label detail = new Label(task.getTasks() + "  "
+            + String.format("%02d", task.getHours()) + "h"
+            + String.format("%02d", task.getMinutes()));
+        detail.setStyle("-fx-font-size: 28px;");
+
+        reminderOverlay.getChildren().addAll(title, detail);
+
+        AnchorPane.setTopAnchor(reminderOverlay, 390.0);
+        AnchorPane.setLeftAnchor(reminderOverlay, 580.0);
+        visualFxml.getChildren().add(reminderOverlay);
+    }
+
+    public void hideReminderOverlay() {
+        if (reminderOverlay != null) {
+            visualFxml.getChildren().remove(reminderOverlay);
+            reminderOverlay = null;
+        }
+    }
 }

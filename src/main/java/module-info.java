@@ -1,4 +1,4 @@
-module fr.qmn.mamoucalendari {
+module fr.qmn.mamoucalendariv2 {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.desktop;
@@ -6,6 +6,7 @@ module fr.qmn.mamoucalendari {
     requires javafx.swing;
     requires org.xerial.sqlitejdbc;
     requires com.microsoft.onnxruntime;
+    requires javafx.media;
 
 
     opens fr.qmn.mamoucalendari to javafx.fxml;

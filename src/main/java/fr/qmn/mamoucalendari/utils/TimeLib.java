@@ -2,6 +2,7 @@ package fr.qmn.mamoucalendari.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class TimeLib {
     //Get actual date at -> 2023-01-21
@@ -12,7 +13,7 @@ public class TimeLib {
 
     //Get actual date at -> Monday 21 January and convert it to -> 2023-01-21
     public String convertDate(String date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("EEEE dd MMMM yyyy"); // Monday 21 January 2023
+        SimpleDateFormat formatter = new SimpleDateFormat("EEEE dd MMMM yyyy", Locale.FRENCH); // Monday 21 January 2023
         try {
             Date date1 = formatter.parse(date); // convert Monday 21 January to Date
             return new SimpleDateFormat("yyyy-MM-dd").format(date1); // convert Date to 2023-01-21
@@ -35,13 +36,13 @@ public class TimeLib {
 
     //Get actual date at -> Monday 21 January
     public String getActualDateWithoutYear() {
-        SimpleDateFormat formatter = new SimpleDateFormat("EEEE dd MMMM");
+        SimpleDateFormat formatter = new SimpleDateFormat("EEEE dd MMMM", Locale.FRENCH);
         return formatter.format(new Date());
     }
 
     //Get actual date at -> 2023-01-21 and convert it to -> Monday 21 January
     public String getActualDateDay(String date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("EEEE dd MMMM");
+        SimpleDateFormat formatter = new SimpleDateFormat("EEEE dd MMMM", Locale.FRENCH);
         try {
             Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(date);
             return formatter.format(date1);
