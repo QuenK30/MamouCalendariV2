@@ -1,10 +1,8 @@
 package fr.qmn.mamoucalendari;
 
 import fr.qmn.mamoucalendari.bdd.SQLInit;
-import fr.qmn.mamoucalendari.bdd.SQLManager;
-import fr.qmn.mamoucalendari.tasks.Tasks;
+import fr.qmn.mamoucalendari.ocr.HandwritingRecognizer;
 import fr.qmn.mamoucalendari.tasks.TasksReminder;
-import fr.qmn.mamoucalendari.tasks.TasksSelect;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -14,6 +12,9 @@ import javafx.stage.StageStyle;
 import java.io.IOException;
 
 public class MCMain extends Application {
+
+    private static HandwritingRecognizer recognizer;
+
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader mainScreenFXML = new FXMLLoader(MCMain.class.getResource("/fr/qmn/mamoucalendari/design/MainScreen.fxml"));
@@ -39,20 +40,29 @@ public class MCMain extends Application {
         calendarScreenStage.show();
     }
 
+    @Override
+    public void stop() {
+        if (recognizer != null) {
+            recognizer.close();
+            recognizer = null;
+        }
+    }
+
+    public static HandwritingRecognizer getRecognizer() {
+        return recognizer;
+    }
+
     public static void main(String[] args) {
-        SQLInit sqlInit = new SQLInit();
-        SQLManager sqlManager = new SQLManager();
-        TasksSelect tasksSelect = new TasksSelect();
+        new SQLInit().createNewDatabase();
+
+        // Le recognizer est créé avant launch() pour être disponible dès que
+        // les controllers JavaFX s'initialisent. Si le modèle est absent, il
+        // démarre en mode dégradé (isReady() == false) sans bloquer le lancement.
+        recognizer = new HandwritingRecognizer();
+
         TasksReminder tasksReminder = new TasksReminder();
         tasksReminder.startReminder();
-        sqlInit.createNewDatabase();
-        /*
-        sqlManager.createTask("2023-12-16", 22, 0, "Test1", false);
-        sqlManager.createTask("2023-12-16", 22, 15, "Test2", false);
-        sqlManager.createTask("2023-12-16", 22, 30, "Test3", false);
-        sqlManager.createTask("2023-12-16", 22, 45, "Test4", false);
-        sqlManager.createTask("2023-12-16", 23, 0, "Test5", false);
-         */
+
         launch();
     }
 }

@@ -5,6 +5,7 @@ module fr.qmn.mamoucalendari {
     requires javafx.graphics;
     requires javafx.swing;
     requires org.xerial.sqlitejdbc;
+    requires com.microsoft.onnxruntime;
 
 
     opens fr.qmn.mamoucalendari to javafx.fxml;

@@ -1,8 +1,8 @@
 package fr.qmn.mamoucalendari.controller.tact;
 
+import fr.qmn.mamoucalendari.MCMain;
 import fr.qmn.mamoucalendari.bdd.SQLManager;
-import fr.qmn.mamoucalendari.ocr.InitOCR;
-import fr.qmn.mamoucalendari.utils.TimeLib;
+import fr.qmn.mamoucalendari.ocr.HandwritingRecognizer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -30,6 +30,7 @@ import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,10 +62,12 @@ public class OCRController {
     private String hoursSelected = null;
     private String minutesSelected = null;
     private String dateConverted;
+    private HandwritingRecognizer recognizer;
 
     public void initialize() {
-        //load css
         ocrFxml.getStylesheets().add(getClass().getResource("/fr/qmn/mamoucalendari/css/ocr.css").toExternalForm());
+        // Récupère le recognizer créé une seule fois dans MCMain
+        recognizer = MCMain.getRecognizer();
         onPressedButtonCancel();
         onValidate();
         setHoursOnList();
@@ -130,10 +133,9 @@ public class OCRController {
 
     public void onValidate() {
         buttonCheck.setOnAction(actionEvent -> {
-            Popup popup = new Popup();
-            TimeLib timeLib = new TimeLib();
-            if(hoursSelected == null || minutesSelected == null){
+            if (hoursSelected == null || minutesSelected == null) {
                 System.out.println("hoursSelected or minutesSelected is null");
+                Popup popup = new Popup();
                 VBox vBox = new VBox();
                 vBox.setStyle("-fx-background-color: #ffd9d8");
                 vBox.setPrefWidth(600);
@@ -148,40 +150,40 @@ public class OCRController {
                 buttonOk.setStyle("-fx-background-color: #00ff00");
                 buttonOk.setPrefWidth(100);
                 buttonOk.setPrefHeight(50);
-                buttonOk.setOnAction(actionEvent1 -> {
-                    popup.hide();
-                });
+                buttonOk.setOnAction(actionEvent1 -> popup.hide());
 
                 vBox.getChildren().addAll(label, buttonOk);
                 popup.getContent().add(vBox);
                 popup.show(ocrFxml.getScene().getWindow());
                 return;
             }
-            captureScreenshot(canvasOCR, timeLib.getActualTimeWithoutColon()+"_ocr");
-
-            System.out.println("Screenshot saved");
+            try {
+                captureAndRecognize(canvasOCR);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
-    private void captureScreenshot(Canvas canvas, String filename) {
-        InitOCR initOCR = new InitOCR();
-        WritableImage image = new WritableImage((int) canvas.getWidth(), (int) canvas.getHeight());
+    /**
+     * Capture le contenu du canvas et lance la reconnaissance ONNX locale.
+     *
+     * L'image reste en mémoire (BufferedImage) : plus d'écriture sur disque,
+     * plus de dépendance à un processus Python ou à un appel réseau.
+     */
+    private void captureAndRecognize(Canvas canvas) throws IOException {
+        WritableImage writableImage = new WritableImage((int) canvas.getWidth(), (int) canvas.getHeight());
         SnapshotParameters parameters = new SnapshotParameters();
         parameters.setFill(Color.WHITE);
-        canvas.snapshot(parameters, image);
-        String path = "src/main/resources/fr/qmn/mamoucalendari/ocr/";
-        File file = new File(path + filename + ".png");
-        System.out.println("File path: " + file.getAbsolutePath());
-        String result;
-        try {
-            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-            System.out.println("Image saved");
-            result = initOCR.receiveImageForOCR(file.getAbsolutePath());
-            System.out.println("after image saved Result: " + result);
-            checkIfEntryIsCorrect(result, dateConverted, Integer.parseInt(hoursSelected), Integer.parseInt(minutesSelected));
-        } catch (IOException e) {
-            System.out.println("OCR Error: " + e);
-        }
+        canvas.snapshot(parameters, writableImage);
+
+        // Conversion en BufferedImage en mémoire (sans passer par le disque)
+        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(writableImage, null);
+        File test = new File("test.png");
+        ImageIO.write(bufferedImage, "png", test);
+
+        String result = (recognizer != null) ? recognizer.recognize(bufferedImage) : "";
+        checkIfEntryIsCorrect(result, dateConverted, Integer.parseInt(hoursSelected), Integer.parseInt(minutesSelected));
     }
 
     public void checkIfEntryIsCorrect(String text, String date, int hours, int minutes) {
