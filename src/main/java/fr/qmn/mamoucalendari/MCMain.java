@@ -32,13 +32,13 @@ public class MCMain extends Application {
         mainScreenStage.setScene(mainScreenScene);
         mainScreenStage.setTitle("Visualisation des tâches");
         mainScreenStage.initStyle(StageStyle.UNDECORATED);
-        mainScreenStage.setFullScreen(true);
+        mainScreenStage.setMaximized(true);
 
         Stage calendarScreenStage = new Stage();
         calendarScreenStage.setScene(calendarScreenScene);
         calendarScreenStage.setTitle("Calendrier");
         calendarScreenStage.initStyle(StageStyle.UNDECORATED);
-        calendarScreenStage.setFullScreen(true);
+        calendarScreenStage.setMaximized(true);
 
         mainScreenStage.show();
         calendarScreenStage.show();

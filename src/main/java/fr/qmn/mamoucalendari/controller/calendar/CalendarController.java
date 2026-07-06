@@ -250,7 +250,7 @@ public class CalendarController {
                 Stage stage = new Stage();
                 stage.initStyle(StageStyle.UNDECORATED);
                 stage.setScene(new Scene(root));
-                stage.setFullScreen(true);
+                stage.setMaximized(true);
                 stage.show();
                 ocrController.setTextActualDay(displayDate, convertDate);
             } catch (Exception ex) {

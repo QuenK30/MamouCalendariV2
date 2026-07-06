@@ -190,7 +190,7 @@ public class OCRController {
         Stage stage = new Stage();
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setScene(new Scene(root));
-        stage.setFullScreen(true);
+        stage.setMaximized(true);
         stage.show();
     }
 
