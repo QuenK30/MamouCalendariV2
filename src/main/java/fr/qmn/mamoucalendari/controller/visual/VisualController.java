@@ -31,15 +31,20 @@ public class VisualController {
     public void initialize() {
         MCMain.activeVisualController = this;
 
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.seconds(0), event -> {
-                    updateDate();
-                    setTasks();
-                }),
-                new KeyFrame(Duration.seconds(1))
+        // Mise à jour de l'horloge chaque seconde (sans accès DB)
+        Timeline clockTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e ->
+            textHours.setText(new TimeLib().getActualTime())
+        ));
+        clockTimeline.setCycleCount(Timeline.INDEFINITE);
+        clockTimeline.play();
+
+        // Mise à jour des tâches et de la date toutes les 60 secondes (DB)
+        Timeline taskTimeline = new Timeline(
+            new KeyFrame(Duration.seconds(0),  e -> { updateDate(); setTasks(); }),
+            new KeyFrame(Duration.seconds(60))
         );
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
+        taskTimeline.setCycleCount(Timeline.INDEFINITE);
+        taskTimeline.play();
     }
 
     private void updateDate() {
@@ -103,12 +108,12 @@ public class VisualController {
 
         String delayLabel = minutesBefore == 0 ? "Maintenant !" : "dans " + minutesBefore + " min";
         Label title = new Label("Rappel  " + delayLabel);
-        title.setStyle("-fx-font-size: 34px; -fx-font-weight: bold;");
+        title.setStyle("-fx-font-size: 34px; -fx-font-weight: bold; -fx-text-fill: black;");
 
         Label detail = new Label(task.getTasks() + "  "
             + String.format("%02d", task.getHours()) + "h"
             + String.format("%02d", task.getMinutes()));
-        detail.setStyle("-fx-font-size: 28px;");
+        detail.setStyle("-fx-font-size: 28px; -fx-text-fill: black;");
 
         reminderOverlay.getChildren().addAll(title, detail);
 

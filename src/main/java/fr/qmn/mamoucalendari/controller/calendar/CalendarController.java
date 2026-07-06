@@ -1,21 +1,26 @@
 package fr.qmn.mamoucalendari.controller.calendar;
 
 import fr.qmn.mamoucalendari.MCMain;
+import fr.qmn.mamoucalendari.bdd.SQLManager;
 import fr.qmn.mamoucalendari.controller.tact.OCRController;
 import fr.qmn.mamoucalendari.tasks.Tasks;
+import fr.qmn.mamoucalendari.tasks.TasksSelect;
 import fr.qmn.mamoucalendari.utils.TimeLib;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -25,6 +30,7 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 import java.util.Calendar;
+import java.util.List;
 
 public class CalendarController {
 
@@ -50,7 +56,8 @@ public class CalendarController {
     private String year        = "";
 
     public AnchorPane calendar;
-    private HBox luOverlay = null;
+    private HBox luOverlay  = null;
+    private VBox dayOverlay = null;
 
     public void initialize() {
         MCMain.activeCalendarController = this;
@@ -82,7 +89,6 @@ public class CalendarController {
             beforeMonth = months[month == 0 ? 11 : month - 1];
             afterMonth  = months[month == 11 ? 0 : month + 1];
 
-            // Today reference
             Calendar todayCal  = Calendar.getInstance();
             int todayDay   = todayCal.get(Calendar.DAY_OF_MONTH);
             int todayMonth = todayCal.get(Calendar.MONTH);
@@ -91,16 +97,14 @@ public class CalendarController {
             boolean isPastMonth    = displayedYear < todayYear
                 || (displayedYear == todayYear && displayedMonth < todayMonth);
 
-            // Calendar layout for displayed month
             Calendar cal = Calendar.getInstance();
             cal.set(Calendar.YEAR, displayedYear);
             cal.set(Calendar.MONTH, displayedMonth);
             cal.set(Calendar.DAY_OF_MONTH, 1);
             int daysInMonth  = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
             int rawDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-            int firstDay     = (rawDayOfWeek == 1) ? 7 : rawDayOfWeek - 1; // 1=Mon ... 7=Sun
+            int firstDay     = (rawDayOfWeek == 1) ? 7 : rawDayOfWeek - 1;
 
-            // Previous month's day count for overflow labels
             Calendar prevCal = Calendar.getInstance();
             prevCal.set(Calendar.YEAR,  month == 0 ? displayedYear - 1 : displayedYear);
             prevCal.set(Calendar.MONTH, month == 0 ? 11 : month - 1);
@@ -116,10 +120,8 @@ public class CalendarController {
                 rectangles[i].setStrokeWidth(6);
 
                 if (i >= firstDay && i < daysInMonth + firstDay) {
-                    // Current month
                     int dayNum = i - firstDay + 1;
                     buttons[i].setText(String.valueOf(dayNum));
-
                     if (isCurrentMonth) {
                         buttons[i].setOpacity(dayNum < todayDay ? 0.3 : 1.0);
                         if (dayNum == todayDay) {
@@ -133,16 +135,12 @@ public class CalendarController {
                         buttons[i].setOpacity(isPastMonth ? 0.3 : 1.0);
                         rectangles[i].setFill(Color.TRANSPARENT);
                     }
-
                 } else if (i < firstDay) {
-                    // Overflow: previous month
                     int dayNum = daysInPrevMonth - firstDay + i + 1;
                     buttons[i].setText(String.valueOf(dayNum));
                     buttons[i].setOpacity(0.3);
                     rectangles[i].setFill(Color.rgb(158, 158, 158));
-
                 } else {
-                    // Overflow: next month
                     int dayNum = i - daysInMonth - firstDay + 1;
                     buttons[i].setText(String.valueOf(dayNum));
                     buttons[i].setOpacity(0.3);
@@ -156,10 +154,12 @@ public class CalendarController {
 
     private void setActionOnMonthButtons() {
         buttonPreviousMonth.setOnAction(e -> {
+            hideDayOverlay();
             if (displayedMonth == 0) { displayedMonth = 11; displayedYear--; }
             else displayedMonth--;
         });
         buttonNextMonth.setOnAction(e -> {
+            hideDayOverlay();
             if (displayedMonth == 11) { displayedMonth = 0; displayedYear++; }
             else displayedMonth++;
         });
@@ -190,30 +190,153 @@ public class CalendarController {
                     }
 
                     int dayIndex = (finalI - 1) % 7;
-                    String date     = days[dayIndex] + " " + buttons[finalI].getText() + " " + month;
-                    String realDate = date + " " + cellYear;
+                    String displayDate = days[dayIndex] + " " + buttons[finalI].getText() + " " + month;
+                    String realDate    = displayDate + " " + cellYear;
                     String convertDate = timeLib.convertDate(realDate);
 
-                    Stage current = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-                    current.close();
-
-                    FXMLLoader loader = new FXMLLoader(
-                        getClass().getResource("/fr/qmn/mamoucalendari/design/SecondScreenTact.fxml"));
-                    Parent root = loader.load();
-                    OCRController ocrController = loader.getController();
-
-                    Stage stage = new Stage();
-                    stage.initStyle(StageStyle.UNDECORATED);
-                    stage.setScene(new Scene(root));
-                    stage.setMaximized(true);
-                    stage.show();
-                    ocrController.setTextActualDay(date, convertDate);
+                    showDayOverlay(displayDate, convertDate);
                 } catch (Exception e) {
-                    showError("Impossible d'ouvrir le clavier : " + e.getMessage());
+                    showError("Impossible d'ouvrir le jour : " + e.getMessage());
                 }
             });
         }
     }
+
+    // ── Overlay tâches du jour ────────────────────────────────────────────────
+
+    private void showDayOverlay(String displayDate, String convertDate) {
+        hideDayOverlay();
+
+        dayOverlay = new VBox(20);
+        dayOverlay.setStyle(
+            "-fx-background-color: white;" +
+            "-fx-border-color: #ff9d9d;" +
+            "-fx-border-width: 4;" +
+            "-fx-border-radius: 14;" +
+            "-fx-background-radius: 14;" +
+            "-fx-padding: 30;");
+        dayOverlay.setAlignment(Pos.TOP_CENTER);
+
+        Label title = new Label(displayDate);
+        title.setStyle("-fx-font-size: 34px; -fx-font-weight: bold; -fx-text-fill: black;");
+
+        VBox taskList = new VBox(12);
+        refreshTaskList(taskList, convertDate);
+
+        ScrollPane scroll = new ScrollPane(taskList);
+        scroll.setFitToWidth(true);
+        scroll.setPrefHeight(380);
+        scroll.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+
+        HBox btnRow = new HBox(24);
+        btnRow.setAlignment(Pos.CENTER);
+
+        Button btnAdd = new Button("＋  Ajouter une tâche");
+        btnAdd.setStyle(
+            "-fx-font-size: 26px;" +
+            "-fx-background-color: #00cc66;" +
+            "-fx-text-fill: white;" +
+            "-fx-padding: 14 36;" +
+            "-fx-background-radius: 10;");
+        btnAdd.setOnAction(e -> {
+            hideDayOverlay();
+            Stage current = (Stage) calendar.getScene().getWindow();
+            current.close();
+            try {
+                FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fr/qmn/mamoucalendari/design/SecondScreenTact.fxml"));
+                Parent root = loader.load();
+                OCRController ocrController = loader.getController();
+                Stage stage = new Stage();
+                stage.initStyle(StageStyle.UNDECORATED);
+                stage.setScene(new Scene(root));
+                stage.setFullScreen(true);
+                stage.show();
+                ocrController.setTextActualDay(displayDate, convertDate);
+            } catch (Exception ex) {
+                showError("Impossible d'ouvrir le clavier : " + ex.getMessage());
+            }
+        });
+
+        Button btnClose = new Button("Fermer");
+        btnClose.setStyle(
+            "-fx-font-size: 26px;" +
+            "-fx-background-color: #f0f0f0;" +
+            "-fx-padding: 14 36;" +
+            "-fx-background-radius: 10;");
+        btnClose.setOnAction(e -> hideDayOverlay());
+
+        btnRow.getChildren().addAll(btnAdd, btnClose);
+        dayOverlay.getChildren().addAll(title, scroll, btnRow);
+
+        AnchorPane.setTopAnchor(dayOverlay,    80.0);
+        AnchorPane.setBottomAnchor(dayOverlay, 80.0);
+        AnchorPane.setLeftAnchor(dayOverlay,  120.0);
+        AnchorPane.setRightAnchor(dayOverlay, 120.0);
+        calendar.getChildren().add(dayOverlay);
+    }
+
+    private void refreshTaskList(VBox taskList, String convertDate) {
+        taskList.getChildren().clear();
+        SQLManager sqlManager = new SQLManager();
+        List<Tasks> tasks = new TasksSelect().getTasksbyDate(convertDate);
+
+        if (tasks.isEmpty()) {
+            Label empty = new Label("Aucune tâche pour ce jour");
+            empty.setStyle("-fx-font-size: 24px; -fx-text-fill: #555;");
+            taskList.getChildren().add(empty);
+            return;
+        }
+
+        for (Tasks task : tasks) {
+            HBox row = new HBox(16);
+            row.setAlignment(Pos.CENTER_LEFT);
+            row.setStyle("-fx-padding: 10 14; -fx-border-color: #eee; -fx-border-width: 0 0 1 0;");
+
+            Label time = new Label(String.format("%02dh%02d", task.getHours(), task.getMinutes()));
+            time.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-min-width: 100; -fx-text-fill: black;");
+
+            Label name = new Label(task.getTasks());
+            name.setStyle("-fx-font-size: 24px; -fx-text-fill: black;");
+            HBox.setHgrow(name, Priority.ALWAYS);
+
+            Button btnDelete = new Button("✕");
+            btnDelete.setStyle(
+                "-fx-font-size: 22px;" +
+                "-fx-background-color: #ff4444;" +
+                "-fx-text-fill: white;" +
+                "-fx-padding: 6 18;" +
+                "-fx-background-radius: 6;");
+            btnDelete.setOnAction(e -> {
+                Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+                confirm.setTitle("Supprimer la tâche");
+                confirm.setHeaderText(null);
+                confirm.setContentText("Supprimer \"" + task.getTasks() + "\" ?");
+                confirm.showAndWait().ifPresent(result -> {
+                    if (result == ButtonType.OK) {
+                        try {
+                            sqlManager.deleteTask(task.getDate(), task.getHours(), task.getMinutes());
+                            refreshTaskList(taskList, convertDate);
+                        } catch (Exception ex) {
+                            showError("Impossible de supprimer : " + ex.getMessage());
+                        }
+                    }
+                });
+            });
+
+            row.getChildren().addAll(time, name, btnDelete);
+            taskList.getChildren().add(row);
+        }
+    }
+
+    private void hideDayOverlay() {
+        if (dayOverlay != null) {
+            calendar.getChildren().remove(dayOverlay);
+            dayOverlay = null;
+        }
+    }
+
+    // ── Overlay rappel Lu ────────────────────────────────────────────────────
 
     public void showLuOverlay(Tasks task, int minutesBefore, Runnable onLu) {
         hideLuOverlay();
@@ -233,7 +356,7 @@ public class CalendarController {
             + "  " + String.format("%02d", task.getHours()) + "h"
             + String.format("%02d", task.getMinutes())
             + "  " + delayLabel);
-        lbl.setStyle("-fx-font-size: 28px;");
+        lbl.setStyle("-fx-font-size: 28px; -fx-text-fill: black;");
 
         Button btnLu = new Button("Lu ✓");
         btnLu.setStyle(

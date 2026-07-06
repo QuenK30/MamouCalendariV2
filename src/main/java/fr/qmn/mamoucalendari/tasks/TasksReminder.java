@@ -90,7 +90,7 @@ public class TasksReminder {
             long diff = ChronoUnit.MINUTES.between(now, taskTime);
 
             for (int trigger : TRIGGERS) {
-                if (diff == trigger) {
+                if (diff >= trigger && diff <= trigger + 1) {
                     String key = task.getDate() + ":" + task.getHours() + ":" + task.getMinutes() + ":" + trigger;
                     if (!sentReminders.contains(key)) {
                         sentReminders.add(key);

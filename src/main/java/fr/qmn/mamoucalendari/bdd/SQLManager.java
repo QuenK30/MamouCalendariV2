@@ -19,4 +19,17 @@ public class SQLManager {
             throw new RuntimeException(e);
         }
     }
+
+    public void deleteTask(String date, int hours, int minutes) {
+        String sql = "DELETE FROM USERS WHERE DATE = ? AND HOURS = ? AND MINUTES = ?";
+        try (Connection connection = DriverManager.getConnection(DBConfig.URL);
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, date);
+            pstmt.setInt(2, hours);
+            pstmt.setInt(3, minutes);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

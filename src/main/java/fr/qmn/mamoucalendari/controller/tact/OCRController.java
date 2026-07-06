@@ -107,8 +107,13 @@ public class OCRController {
                 popup.show(ocrFxml.getScene().getWindow());
                 return;
             }
+            String taskText = textInput.getText().trim();
+            if (taskText.isEmpty()) {
+                showError("Veuillez saisir une tâche.");
+                return;
+            }
             checkIfEntryIsCorrect(
-                textInput.getText().trim(),
+                taskText,
                 dateConverted,
                 Integer.parseInt(hoursSelected),
                 Integer.parseInt(minutesSelected)
@@ -133,7 +138,7 @@ public class OCRController {
         Label label  = new Label("Voulez-vous valider cette tâche ?");
         label.setStyle("-fx-font-size: 20px");
 
-        Label result = new Label(date + " à " + hours + "h" + minutes + "m\n" + text);
+        Label result = new Label(date + " à " + String.format("%02dh%02d", hours, minutes) + "\n" + text);
         result.setStyle("-fx-font-size: 20px");
         result.setAlignment(Pos.CENTER);
 
@@ -185,7 +190,7 @@ public class OCRController {
         Stage stage = new Stage();
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setScene(new Scene(root));
-        stage.setMaximized(true);
+        stage.setFullScreen(true);
         stage.show();
     }
 
