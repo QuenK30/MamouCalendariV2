@@ -25,6 +25,16 @@ public class SQLInit {
             } else {
                 System.out.println("| La base de données existe déjà             |");
             }
+            if (!doesTableIsCreate(connection, "SCREEN_CONFIG")) {
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate(
+                        "CREATE TABLE SCREEN_CONFIG(" +
+                        "ID INTEGER PRIMARY KEY," +
+                        "screen_visual INTEGER NOT NULL DEFAULT 0," +
+                        "screen_calendar INTEGER NOT NULL DEFAULT 0," +
+                        "screen_ocr INTEGER NOT NULL DEFAULT 0)");
+                }
+            }
         } catch (Exception e) {
             System.out.println("Error: When creating db");
             e.printStackTrace();

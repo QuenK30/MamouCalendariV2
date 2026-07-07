@@ -36,9 +36,9 @@
             <version>25.0.3</version>
         </dependency>
         <dependency>
-            <groupId>com.microsoft.onnxruntime</groupId>
-            <artifactId>onnxruntime</artifactId>
-            <version>1.27.0</version>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-vision</artifactId>
+            <version>1.84.0</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -155,13 +155,16 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>fr.qmn.mamoucalendariv2/fr.qmn.mamoucalendari.MCMain</mainClass>
+                            <mainClass>fr.qmn.mamoucalendari.MCMain</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>
                             <noManPages>true</noManPages>
                             <stripDebug>true</stripDebug>
                             <noHeaderFiles>true</noHeaderFiles>
+                            <options>
+                                <option>--add-modules=ALL-MODULE-PATH</option>
+                            </options>
                         </configuration>
                     </execution>
                 </executions>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="1080.0" prefWidth="1920.0"
+            style="-fx-background-color: white;"
+            xmlns="http://javafx.com/javafx/20.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="fr.qmn.mamoucalendari.controller.setup.SetupController">
+   <children>
+      <VBox fx:id="root" spacing="48.0" alignment="CENTER"
+            AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+            AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <children>
+            <Label text="Configuration des écrans"
+                   style="-fx-font-size: 52px; -fx-font-weight: bold; -fx-text-fill: #333;" />
+            <Label fx:id="screenCountLabel"
+                   style="-fx-font-size: 26px; -fx-text-fill: #777;" />
+            <GridPane fx:id="assignGrid" hgap="40.0" vgap="28.0" alignment="CENTER" />
+            <Button fx:id="buttonValider" text="Valider" mnemonicParsing="false"
+                    prefWidth="220.0" prefHeight="80.0" disable="true"
+                    style="-fx-font-size: 30px; -fx-background-color: #00cc66; -fx-text-fill: white; -fx-background-radius: 12;"
+                    onAction="#onValider" />
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

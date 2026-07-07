@@ -1,20 +1,27 @@
 package fr.qmn.mamoucalendari.controller.tact;
 
 import fr.qmn.mamoucalendari.bdd.SQLManager;
+import fr.qmn.mamoucalendari.bdd.ScreenConfigManager;
+import fr.qmn.mamoucalendari.ocr.CloudVisionOCR;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
@@ -22,12 +29,15 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.awt.image.BufferedImage;
 import java.time.LocalTime;
 
 public class OCRController {
@@ -39,9 +49,11 @@ public class OCRController {
     @FXML public AnchorPane ocrFxml;
     @FXML public ListView ListHours;
     @FXML public ListView ListMinutes;
-    @FXML private TextField textInput;
     @FXML private AnchorPane keyboardPane;
+    @FXML private Canvas drawingCanvas;
+    @FXML private Button buttonGomme;
 
+    private GraphicsContext gc;
     private double startY;
     private int startIndex;
     private String hoursSelected   = null;
@@ -56,6 +68,7 @@ public class OCRController {
         setHoursOnList();
         setMinutesOnList();
         buildKeyboard();
+        initCanvas();
     }
 
     public void setTextActualDay(String date, String dateConverted) {
@@ -107,17 +120,30 @@ public class OCRController {
                 popup.show(ocrFxml.getScene().getWindow());
                 return;
             }
-            String taskText = textInput.getText().trim();
-            if (taskText.isEmpty()) {
-                showError("Veuillez saisir une tâche.");
-                return;
-            }
-            checkIfEntryIsCorrect(
-                taskText,
-                dateConverted,
-                Integer.parseInt(hoursSelected),
-                Integer.parseInt(minutesSelected)
-            );
+            buttonCheck.setDisable(true);
+            WritableImage wi = drawingCanvas.snapshot(null, null);
+            BufferedImage bi = SwingFXUtils.fromFXImage(wi, null);
+            new Thread(() -> {
+                String result = CloudVisionOCR.recognize(bi);
+                Platform.runLater(() -> {
+                    buttonCheck.setDisable(false);
+                    if (result.isEmpty()) {
+                        showError("OCR : aucun texte reconnu.\nVérifiez que GOOGLE_APPLICATION_CREDENTIALS est défini.");
+                        return;
+                    }
+                    String cleaned = result.replaceAll("[\\r\\n]+", " ").replaceAll(" {2,}", " ").trim();
+                    if (cleaned.isEmpty()) {
+                        showError("OCR : texte vide après nettoyage.");
+                        return;
+                    }
+                    checkIfEntryIsCorrect(
+                        cleaned,
+                        dateConverted,
+                        Integer.parseInt(hoursSelected),
+                        Integer.parseInt(minutesSelected)
+                    );
+                });
+            }, "ocr-thread").start();
         });
     }
 
@@ -161,10 +187,7 @@ public class OCRController {
         buttonNo.setStyle("-fx-background-color: #ff0000");
         buttonNo.setPrefWidth(100);
         buttonNo.setPrefHeight(50);
-        buttonNo.setOnAction(actionEvent -> {
-            popup.hide();
-            textInput.clear();
-        });
+        buttonNo.setOnAction(actionEvent -> popup.hide());
 
         vBox.getChildren().addAll(label, result, buttonYes, buttonNo);
         popup.getContent().add(vBox);
@@ -190,8 +213,34 @@ public class OCRController {
         Stage stage = new Stage();
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setScene(new Scene(root));
-        stage.setMaximized(true);
+        ScreenConfigManager.applyScreen(stage, ScreenConfigManager.getConfig()[1]);
         stage.show();
+    }
+
+    private void initCanvas() {
+        gc = drawingCanvas.getGraphicsContext2D();
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0, 0, drawingCanvas.getWidth(), drawingCanvas.getHeight());
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(4);
+        gc.setLineCap(StrokeLineCap.ROUND);
+
+        drawingCanvas.setOnMousePressed(e -> { gc.beginPath(); gc.moveTo(e.getX(), e.getY()); });
+        drawingCanvas.setOnMouseDragged(e -> { gc.lineTo(e.getX(), e.getY()); gc.stroke(); gc.moveTo(e.getX(), e.getY()); });
+
+        final boolean[] eraserMode = {false};
+        buttonGomme.setOnAction(e -> {
+            eraserMode[0] = !eraserMode[0];
+            if (eraserMode[0]) {
+                gc.setStroke(Color.WHITE);
+                gc.setLineWidth(40);
+                buttonGomme.setStyle("-fx-font-size: 22px; -fx-background-color: #ff9d9d; -fx-border-color: #ff5555; -fx-border-width: 2; -fx-padding: 12 20; -fx-background-radius: 8;");
+            } else {
+                gc.setStroke(Color.BLACK);
+                gc.setLineWidth(4);
+                buttonGomme.setStyle("-fx-font-size: 22px; -fx-background-color: #f0f0f0; -fx-border-color: #ccc; -fx-border-width: 2; -fx-padding: 12 20; -fx-background-radius: 8;");
+            }
+        });
     }
 
     private void buildKeyboard() {
@@ -270,12 +319,9 @@ public class OCRController {
         keyboardPane.getChildren().add(grid);
     }
 
-    private void appendChar(String c) { textInput.appendText(c); }
+    private void appendChar(String c) {}
 
-    private void backspace() {
-        String t = textInput.getText();
-        if (!t.isEmpty()) textInput.setText(t.substring(0, t.length() - 1));
-    }
+    private void backspace() {}
 
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

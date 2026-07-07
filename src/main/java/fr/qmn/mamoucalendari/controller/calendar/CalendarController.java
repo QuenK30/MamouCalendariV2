@@ -2,6 +2,7 @@ package fr.qmn.mamoucalendari.controller.calendar;
 
 import fr.qmn.mamoucalendari.MCMain;
 import fr.qmn.mamoucalendari.bdd.SQLManager;
+import fr.qmn.mamoucalendari.bdd.ScreenConfigManager;
 import fr.qmn.mamoucalendari.controller.tact.OCRController;
 import fr.qmn.mamoucalendari.tasks.Tasks;
 import fr.qmn.mamoucalendari.tasks.TasksSelect;
@@ -178,23 +179,37 @@ public class CalendarController {
                     Rectangle rect = (Rectangle) calendar.lookup("#rect" + finalI);
                     String month;
                     int cellYear;
+                    int cellMonth;
                     if (rect.getFill().equals(Color.rgb(158, 158, 158))) {
-                        month    = beforeMonth;
-                        cellYear = (displayedMonth == 0) ? displayedYear - 1 : displayedYear;
+                        cellMonth = (displayedMonth == 0) ? 11 : displayedMonth - 1;
+                        cellYear  = (displayedMonth == 0) ? displayedYear - 1 : displayedYear;
+                        month     = beforeMonth;
                     } else if (rect.getFill().equals(Color.rgb(158, 158, 158, 0.3))) {
-                        month    = afterMonth;
-                        cellYear = (displayedMonth == 11) ? displayedYear + 1 : displayedYear;
+                        cellMonth = (displayedMonth == 11) ? 0 : displayedMonth + 1;
+                        cellYear  = (displayedMonth == 11) ? displayedYear + 1 : displayedYear;
+                        month     = afterMonth;
                     } else {
-                        month    = textActualMonth.getText();
-                        cellYear = displayedYear;
+                        cellMonth = displayedMonth;
+                        cellYear  = displayedYear;
+                        month     = textActualMonth.getText();
                     }
+
+                    int dayNum = Integer.parseInt(buttons[finalI].getText());
+                    java.util.Calendar today = java.util.Calendar.getInstance();
+                    int todayYear  = today.get(java.util.Calendar.YEAR);
+                    int todayMonth = today.get(java.util.Calendar.MONTH);
+                    int todayDay   = today.get(java.util.Calendar.DAY_OF_MONTH);
+                    boolean isPast;
+                    if (cellYear != todayYear)        isPast = cellYear  < todayYear;
+                    else if (cellMonth != todayMonth) isPast = cellMonth < todayMonth;
+                    else                              isPast = dayNum    < todayDay;
 
                     int dayIndex = (finalI - 1) % 7;
                     String displayDate = days[dayIndex] + " " + buttons[finalI].getText() + " " + month;
                     String realDate    = displayDate + " " + cellYear;
                     String convertDate = timeLib.convertDate(realDate);
 
-                    showDayOverlay(displayDate, convertDate);
+                    showDayOverlay(displayDate, convertDate, isPast);
                 } catch (Exception e) {
                     showError("Impossible d'ouvrir le jour : " + e.getMessage());
                 }
@@ -204,7 +219,7 @@ public class CalendarController {
 
     // ── Overlay tâches du jour ────────────────────────────────────────────────
 
-    private void showDayOverlay(String displayDate, String convertDate) {
+    private void showDayOverlay(String displayDate, String convertDate, boolean isPast) {
         hideDayOverlay();
 
         dayOverlay = new VBox(20);
@@ -221,7 +236,7 @@ public class CalendarController {
         title.setStyle("-fx-font-size: 34px; -fx-font-weight: bold; -fx-text-fill: black;");
 
         VBox taskList = new VBox(12);
-        refreshTaskList(taskList, convertDate);
+        refreshTaskList(taskList, convertDate, isPast);
 
         ScrollPane scroll = new ScrollPane(taskList);
         scroll.setFitToWidth(true);
@@ -231,32 +246,42 @@ public class CalendarController {
         HBox btnRow = new HBox(24);
         btnRow.setAlignment(Pos.CENTER);
 
-        Button btnAdd = new Button("＋  Ajouter une tâche");
-        btnAdd.setStyle(
-            "-fx-font-size: 26px;" +
-            "-fx-background-color: #00cc66;" +
-            "-fx-text-fill: white;" +
-            "-fx-padding: 14 36;" +
-            "-fx-background-radius: 10;");
-        btnAdd.setOnAction(e -> {
-            hideDayOverlay();
-            Stage current = (Stage) calendar.getScene().getWindow();
-            current.close();
-            try {
-                FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fr/qmn/mamoucalendari/design/SecondScreenTact.fxml"));
-                Parent root = loader.load();
-                OCRController ocrController = loader.getController();
-                Stage stage = new Stage();
-                stage.initStyle(StageStyle.UNDECORATED);
-                stage.setScene(new Scene(root));
-                stage.setMaximized(true);
-                stage.show();
-                ocrController.setTextActualDay(displayDate, convertDate);
-            } catch (Exception ex) {
-                showError("Impossible d'ouvrir le clavier : " + ex.getMessage());
-            }
-        });
+        if (isPast) {
+            Label readOnly = new Label("🔒 Lecture seule");
+            readOnly.setStyle(
+                "-fx-font-size: 22px;" +
+                "-fx-text-fill: #999;" +
+                "-fx-padding: 14 36;");
+            btnRow.getChildren().add(readOnly);
+        } else {
+            Button btnAdd = new Button("＋  Ajouter une tâche");
+            btnAdd.setStyle(
+                "-fx-font-size: 26px;" +
+                "-fx-background-color: #00cc66;" +
+                "-fx-text-fill: white;" +
+                "-fx-padding: 14 36;" +
+                "-fx-background-radius: 10;");
+            btnAdd.setOnAction(e -> {
+                hideDayOverlay();
+                Stage current = (Stage) calendar.getScene().getWindow();
+                current.close();
+                try {
+                    FXMLLoader loader = new FXMLLoader(
+                        getClass().getResource("/fr/qmn/mamoucalendari/design/SecondScreenTact.fxml"));
+                    Parent root = loader.load();
+                    OCRController ocrController = loader.getController();
+                    Stage stage = new Stage();
+                    stage.initStyle(StageStyle.UNDECORATED);
+                    stage.setScene(new Scene(root));
+                    ScreenConfigManager.applyScreen(stage, ScreenConfigManager.getConfig()[2]);
+                    stage.show();
+                    ocrController.setTextActualDay(displayDate, convertDate);
+                } catch (Exception ex) {
+                    showError("Impossible d'ouvrir le clavier : " + ex.getMessage());
+                }
+            });
+            btnRow.getChildren().add(btnAdd);
+        }
 
         Button btnClose = new Button("Fermer");
         btnClose.setStyle(
@@ -266,7 +291,7 @@ public class CalendarController {
             "-fx-background-radius: 10;");
         btnClose.setOnAction(e -> hideDayOverlay());
 
-        btnRow.getChildren().addAll(btnAdd, btnClose);
+        btnRow.getChildren().add(btnClose);
         dayOverlay.getChildren().addAll(title, scroll, btnRow);
 
         AnchorPane.setTopAnchor(dayOverlay,    80.0);
@@ -276,7 +301,7 @@ public class CalendarController {
         calendar.getChildren().add(dayOverlay);
     }
 
-    private void refreshTaskList(VBox taskList, String convertDate) {
+    private void refreshTaskList(VBox taskList, String convertDate, boolean isPast) {
         taskList.getChildren().clear();
         SQLManager sqlManager = new SQLManager();
         List<Tasks> tasks = new TasksSelect().getTasksbyDate(convertDate);
@@ -300,31 +325,35 @@ public class CalendarController {
             name.setStyle("-fx-font-size: 24px; -fx-text-fill: black;");
             HBox.setHgrow(name, Priority.ALWAYS);
 
-            Button btnDelete = new Button("✕");
-            btnDelete.setStyle(
-                "-fx-font-size: 22px;" +
-                "-fx-background-color: #ff4444;" +
-                "-fx-text-fill: white;" +
-                "-fx-padding: 6 18;" +
-                "-fx-background-radius: 6;");
-            btnDelete.setOnAction(e -> {
-                Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-                confirm.setTitle("Supprimer la tâche");
-                confirm.setHeaderText(null);
-                confirm.setContentText("Supprimer \"" + task.getTasks() + "\" ?");
-                confirm.showAndWait().ifPresent(result -> {
-                    if (result == ButtonType.OK) {
-                        try {
-                            sqlManager.deleteTask(task.getDate(), task.getHours(), task.getMinutes());
-                            refreshTaskList(taskList, convertDate);
-                        } catch (Exception ex) {
-                            showError("Impossible de supprimer : " + ex.getMessage());
-                        }
-                    }
-                });
-            });
+            row.getChildren().addAll(time, name);
 
-            row.getChildren().addAll(time, name, btnDelete);
+            if (!isPast) {
+                Button btnDelete = new Button("✕");
+                btnDelete.setStyle(
+                    "-fx-font-size: 22px;" +
+                    "-fx-background-color: #ff4444;" +
+                    "-fx-text-fill: white;" +
+                    "-fx-padding: 6 18;" +
+                    "-fx-background-radius: 6;");
+                btnDelete.setOnAction(e -> {
+                    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirm.setTitle("Supprimer la tâche");
+                    confirm.setHeaderText(null);
+                    confirm.setContentText("Supprimer \"" + task.getTasks() + "\" ?");
+                    confirm.showAndWait().ifPresent(result -> {
+                        if (result == ButtonType.OK) {
+                            try {
+                                sqlManager.deleteTask(task.getDate(), task.getHours(), task.getMinutes());
+                                refreshTaskList(taskList, convertDate, false);
+                            } catch (Exception ex) {
+                                showError("Impossible de supprimer : " + ex.getMessage());
+                            }
+                        }
+                    });
+                });
+                row.getChildren().add(btnDelete);
+            }
+
             taskList.getChildren().add(row);
         }
     }
