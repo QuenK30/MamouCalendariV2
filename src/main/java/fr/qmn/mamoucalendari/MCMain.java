@@ -38,7 +38,7 @@ public class MCMain extends Application {
         Stage setup = new Stage();
         setup.initStyle(StageStyle.UNDECORATED);
         setup.setScene(new Scene(root));
-        ScreenConfigManager.applyScreen(setup, 0);
+        ScreenConfigManager.applyScreen(setup, root, 0);
         setup.setAlwaysOnTop(true);
         setup.show();
     }
@@ -49,26 +49,28 @@ public class MCMain extends Application {
             try {
                 FXMLLoader mainFxml = new FXMLLoader(MCMain.class.getResource(
                     "/fr/qmn/mamoucalendari/design/MainScreen.fxml"));
-                Scene mainScene = new Scene(mainFxml.load(), 1920, 1080);
+                Parent mainRoot = mainFxml.load();
+                Scene mainScene = new Scene(mainRoot);
                 mainScene.getStylesheets().add(MCMain.class.getResource(
                     "/fr/qmn/mamoucalendari/css/visual.css").toExternalForm());
                 Stage mainStage = new Stage();
                 mainStage.setScene(mainScene);
                 mainStage.setTitle("Visualisation des tâches");
                 mainStage.initStyle(StageStyle.UNDECORATED);
-                ScreenConfigManager.applyScreen(mainStage, cfg[0]);
+                ScreenConfigManager.applyScreen(mainStage, mainRoot, cfg[0]);
                 mainStage.show();
 
                 FXMLLoader calFxml = new FXMLLoader(MCMain.class.getResource(
                     "/fr/qmn/mamoucalendari/design/SecondScreenCalendar.fxml"));
-                Scene calScene = new Scene(calFxml.load(), 1920, 1080);
+                Parent calRoot = calFxml.load();
+                Scene calScene = new Scene(calRoot);
                 calScene.getStylesheets().add(MCMain.class.getResource(
                     "/fr/qmn/mamoucalendari/css/calendar.css").toExternalForm());
                 Stage calStage = new Stage();
                 calStage.setScene(calScene);
                 calStage.setTitle("Calendrier");
                 calStage.initStyle(StageStyle.UNDECORATED);
-                ScreenConfigManager.applyScreen(calStage, cfg[1]);
+                ScreenConfigManager.applyScreen(calStage, calRoot, cfg[1]);
                 calStage.show();
             } catch (IOException e) {
                 e.printStackTrace();

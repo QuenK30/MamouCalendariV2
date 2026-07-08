@@ -1,6 +1,8 @@
 package fr.qmn.mamoucalendari.bdd;
 
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Parent;
+import javafx.scene.transform.Scale;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -53,6 +55,26 @@ public class ScreenConfigManager {
         var screens = Screen.getScreens();
         int idx = Math.max(0, Math.min(screenIndex, screens.size() - 1));
         Rectangle2D b = screens.get(idx).getVisualBounds();
+        stage.setX(b.getMinX());
+        stage.setY(b.getMinY());
+        stage.setWidth(b.getWidth());
+        stage.setHeight(b.getHeight());
+    }
+
+    private static final double DESIGN_W = 1920.0;
+    private static final double DESIGN_H = 1080.0;
+
+    /**
+     * Positionne le Stage sur l'écran cible et applique un Scale sur la racine
+     * pour que le layout 1920×1080 remplisse la résolution réelle de l'écran.
+     */
+    public static void applyScreen(Stage stage, Parent root, int screenIndex) {
+        var screens = Screen.getScreens();
+        int idx = Math.max(0, Math.min(screenIndex, screens.size() - 1));
+        Rectangle2D b = screens.get(idx).getVisualBounds();
+        double sx = b.getWidth()  / DESIGN_W;
+        double sy = b.getHeight() / DESIGN_H;
+        root.getTransforms().setAll(new Scale(sx, sy, 0, 0));
         stage.setX(b.getMinX());
         stage.setY(b.getMinY());
         stage.setWidth(b.getWidth());

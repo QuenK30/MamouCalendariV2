@@ -213,7 +213,7 @@ public class OCRController {
         Stage stage = new Stage();
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setScene(new Scene(root));
-        ScreenConfigManager.applyScreen(stage, ScreenConfigManager.getConfig()[1]);
+        ScreenConfigManager.applyScreen(stage, root, ScreenConfigManager.getConfig()[1]);
         stage.show();
     }
 

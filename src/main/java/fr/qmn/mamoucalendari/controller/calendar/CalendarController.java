@@ -273,7 +273,7 @@ public class CalendarController {
                     Stage stage = new Stage();
                     stage.initStyle(StageStyle.UNDECORATED);
                     stage.setScene(new Scene(root));
-                    ScreenConfigManager.applyScreen(stage, ScreenConfigManager.getConfig()[2]);
+                    ScreenConfigManager.applyScreen(stage, root, ScreenConfigManager.getConfig()[2]);
                     stage.show();
                     ocrController.setTextActualDay(displayDate, convertDate);
                 } catch (Exception ex) {
