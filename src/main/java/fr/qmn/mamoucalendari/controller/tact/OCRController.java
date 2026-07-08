@@ -1,7 +1,7 @@
 package fr.qmn.mamoucalendari.controller.tact;
 
-import fr.qmn.mamoucalendari.bdd.SQLManager;
 import fr.qmn.mamoucalendari.bdd.ScreenConfigManager;
+import fr.qmn.mamoucalendari.service.TaskService;
 import fr.qmn.mamoucalendari.ocr.CloudVisionOCR;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -59,6 +59,8 @@ public class OCRController {
     private String hoursSelected   = null;
     private String minutesSelected = null;
     private String dateConverted;
+
+    private final TaskService taskService = new TaskService();
 
     public void initialize() {
         ocrFxml.getStylesheets().add(
@@ -152,7 +154,6 @@ public class OCRController {
         // getSource().getScene().getWindow() retourne la PopupWindow, pas le Stage.
         Stage tactStage = (Stage) ocrFxml.getScene().getWindow();
         Popup popup = new Popup();
-        SQLManager sqlManager = new SQLManager();
 
         VBox vBox = new VBox();
         vBox.setStyle("-fx-background-color: #ffd9d8");
@@ -175,7 +176,7 @@ public class OCRController {
         buttonYes.setOnAction(actionEvent -> {
             popup.hide();
             try {
-                sqlManager.createTask(date, hours, minutes, text, false);
+                taskService.createTask(date, hours, minutes, text, false);
                 tactStage.close();
                 openCalendarScreen();
             } catch (Exception e) {

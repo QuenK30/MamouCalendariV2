@@ -1,8 +1,8 @@
 package fr.qmn.mamoucalendari.controller.visual;
 
 import fr.qmn.mamoucalendari.MCMain;
+import fr.qmn.mamoucalendari.service.TaskService;
 import fr.qmn.mamoucalendari.tasks.Tasks;
-import fr.qmn.mamoucalendari.tasks.TasksSelect;
 import fr.qmn.mamoucalendari.utils.StringLib;
 import fr.qmn.mamoucalendari.utils.TimeLib;
 import javafx.animation.KeyFrame;
@@ -28,6 +28,8 @@ public class VisualController {
 
     private VBox reminderOverlay = null;
 
+    private final TaskService taskService = new TaskService();
+
     public void initialize() {
         MCMain.activeVisualController = this;
 
@@ -51,10 +53,9 @@ public class VisualController {
         TimeLib timeLib = new TimeLib();
         StringLib stringLib = new StringLib();
         String actualDate = timeLib.getActualDate();
-        TasksSelect tasksSelect = new TasksSelect();
         textDate.setText(stringLib.capitalizeFirstLetterOfEachWord(timeLib.getActualDateWithoutYear()));
         textHours.setText(timeLib.getActualTime());
-        textCountTasks.setText(String.valueOf(tasksSelect.getAllTasksByDate(actualDate).size()));
+        textCountTasks.setText(String.valueOf(taskService.getAllTasksByDate(actualDate).size()));
     }
 
     private void setTasks() {
@@ -65,7 +66,6 @@ public class VisualController {
     }
 
     private Tasks[] getClosestTask() {
-        TasksSelect tasksSelect = new TasksSelect();
         TimeLib timeLib = new TimeLib();
 
         String actualDate = timeLib.getActualDate();
@@ -77,7 +77,7 @@ public class VisualController {
         int actualHoursTime = Integer.parseInt(timeParts[0]);
         int actualMinutesTime = Integer.parseInt(timeParts[1]);
 
-        return tasksSelect.getClosestTaskByTime(actualDate, actualHoursTime, actualMinutesTime);
+        return taskService.getClosestTaskByTime(actualDate, actualHoursTime, actualMinutesTime);
     }
 
     private void updateTaskUI(Text timeLabel, Text taskLabel, Tasks task) {
