@@ -1,11 +1,10 @@
 package fr.qmn.mamoucalendari.controller.calendar;
 
 import fr.qmn.mamoucalendari.MCMain;
-import fr.qmn.mamoucalendari.bdd.SQLManager;
 import fr.qmn.mamoucalendari.bdd.ScreenConfigManager;
 import fr.qmn.mamoucalendari.controller.tact.OCRController;
+import fr.qmn.mamoucalendari.service.TaskService;
 import fr.qmn.mamoucalendari.tasks.Tasks;
-import fr.qmn.mamoucalendari.tasks.TasksSelect;
 import fr.qmn.mamoucalendari.utils.TimeLib;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -59,6 +58,8 @@ public class CalendarController {
     public AnchorPane calendar;
     private HBox luOverlay  = null;
     private VBox dayOverlay = null;
+
+    private final TaskService taskService = new TaskService();
 
     public void initialize() {
         MCMain.activeCalendarController = this;
@@ -303,8 +304,7 @@ public class CalendarController {
 
     private void refreshTaskList(VBox taskList, String convertDate, boolean isPast) {
         taskList.getChildren().clear();
-        SQLManager sqlManager = new SQLManager();
-        List<Tasks> tasks = new TasksSelect().getTasksbyDate(convertDate);
+        List<Tasks> tasks = taskService.getTasksByDate(convertDate);
 
         if (tasks.isEmpty()) {
             Label empty = new Label("Aucune tâche pour ce jour");
@@ -343,7 +343,7 @@ public class CalendarController {
                     confirm.showAndWait().ifPresent(result -> {
                         if (result == ButtonType.OK) {
                             try {
-                                sqlManager.deleteTask(task.getDate(), task.getHours(), task.getMinutes());
+                                taskService.deleteTask(task.getUuid());
                                 refreshTaskList(taskList, convertDate, false);
                             } catch (Exception ex) {
                                 showError("Impossible de supprimer : " + ex.getMessage());
