@@ -42,6 +42,18 @@ public class SQLInit {
                         "screen_ocr INTEGER NOT NULL DEFAULT 0)");
                 }
             }
+            if (!doesTableIsCreate(connection, "SYNC_QUEUE")) {
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate(
+                        "CREATE TABLE SYNC_QUEUE(" +
+                        "ID         INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        "OPERATION  TEXT    NOT NULL," +
+                        "PAYLOAD    TEXT    NOT NULL," +
+                        "STATUS     TEXT    DEFAULT 'PENDING'," +
+                        "ATTEMPTS   INTEGER DEFAULT 0," +
+                        "CREATED_AT TEXT    NOT NULL)");
+                }
+            }
         } catch (Exception e) {
             System.out.println("Error: When creating db");
             e.printStackTrace();

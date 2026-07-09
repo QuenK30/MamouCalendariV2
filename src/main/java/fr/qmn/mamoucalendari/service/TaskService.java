@@ -1,7 +1,7 @@
 package fr.qmn.mamoucalendari.service;
 
-import fr.qmn.mamoucalendari.repository.SQLiteTaskRepository;
 import fr.qmn.mamoucalendari.repository.TaskRepository;
+import fr.qmn.mamoucalendari.repository.TaskRepositoryFactory;
 import fr.qmn.mamoucalendari.tasks.Tasks;
 
 import java.util.List;
@@ -11,7 +11,7 @@ public class TaskService {
     private final TaskRepository repository;
 
     public TaskService() {
-        this(new SQLiteTaskRepository());
+        this(TaskRepositoryFactory.create());
     }
 
     public TaskService(TaskRepository repository) {
@@ -34,8 +34,8 @@ public class TaskService {
         repository.createTask(date, hours, minutes, tasks, isDone);
     }
 
-    public void deleteTask(String date, int hours, int minutes) {
-        repository.deleteTask(date, hours, minutes);
+    public void deleteTask(String uuid) {
+        repository.deleteTask(uuid);
     }
 
     public void markTaskDone(String uuid) {

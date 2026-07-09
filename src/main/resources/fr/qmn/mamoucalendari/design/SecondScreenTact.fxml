@@ -27,7 +27,7 @@
       <Button fx:id="buttonNextDay" layoutX="1535.0" layoutY="59.0" mnemonicParsing="false" prefHeight="99.0" prefWidth="332.0" text="Button"/>
 
       <!-- Zone principale : canvas plein écran avec clavier en overlay (caché par défaut) -->
-      <AnchorPane layoutX="217.0" layoutY="213.0" prefWidth="1704.0" prefHeight="752.0">
+      <AnchorPane fx:id="canvasPane" layoutX="217.0" layoutY="213.0" prefWidth="1704.0" prefHeight="752.0" visible="false">
          <children>
             <!-- Canvas plein écran -->
             <Canvas fx:id="drawingCanvas" width="1704.0" height="752.0" />

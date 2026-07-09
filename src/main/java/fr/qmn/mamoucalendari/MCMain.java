@@ -2,8 +2,13 @@ package fr.qmn.mamoucalendari;
 
 import fr.qmn.mamoucalendari.bdd.SQLInit;
 import fr.qmn.mamoucalendari.bdd.ScreenConfigManager;
+import fr.qmn.mamoucalendari.config.AppConfig;
+import fr.qmn.mamoucalendari.config.RemoteApiClient;
 import fr.qmn.mamoucalendari.controller.calendar.CalendarController;
 import fr.qmn.mamoucalendari.controller.visual.VisualController;
+import fr.qmn.mamoucalendari.repository.SQLiteTaskRepository;
+import fr.qmn.mamoucalendari.repository.SyncQueue;
+import fr.qmn.mamoucalendari.service.SyncWorker;
 import fr.qmn.mamoucalendari.tasks.TasksReminder;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -21,6 +26,7 @@ public class MCMain extends Application {
     public static volatile CalendarController activeCalendarController = null;
 
     private static TasksReminder tasksReminder;
+    private static SyncWorker    syncWorker;
 
     @Override
     public void start(Stage ignored) throws IOException {
@@ -79,12 +85,21 @@ public class MCMain extends Application {
     @Override
     public void stop() {
         if (tasksReminder != null) tasksReminder.shutdown();
+        if (syncWorker    != null) syncWorker.shutdown();
     }
 
     public static void main(String[] args) {
         new SQLInit().createNewDatabase();
         tasksReminder = new TasksReminder();
         tasksReminder.startReminder();
+        if (AppConfig.getMode().equals("sync")) {
+            syncWorker = new SyncWorker(
+                new SyncQueue(),
+                new RemoteApiClient(AppConfig.getApiUrl(), AppConfig.getApiKey()),
+                new SQLiteTaskRepository()
+            );
+            syncWorker.start();
+        }
         launch();
     }
 }

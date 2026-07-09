@@ -343,7 +343,7 @@ public class CalendarController {
                     confirm.showAndWait().ifPresent(result -> {
                         if (result == ButtonType.OK) {
                             try {
-                                taskService.deleteTask(task.getDate(), task.getHours(), task.getMinutes());
+                                taskService.deleteTask(task.getUuid());
                                 refreshTaskList(taskList, convertDate, false);
                             } catch (Exception ex) {
                                 showError("Impossible de supprimer : " + ex.getMessage());

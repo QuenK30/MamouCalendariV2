@@ -64,6 +64,10 @@ public class SQLiteTaskRepository implements TaskRepository {
 
     @Override
     public void createTask(String date, int hours, int minutes, String tasks, boolean isDone) {
+        createTaskAndGetUuid(date, hours, minutes, tasks, isDone);
+    }
+
+    public String createTaskAndGetUuid(String date, int hours, int minutes, String tasks, boolean isDone) {
         String sql = "INSERT INTO USERS (DATE, HOURS, MINUTES, TASKS, ISDONE, UUID, CREATED_AT, UPDATED_AT) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         String now  = Instant.now().toString();
@@ -82,19 +86,30 @@ public class SQLiteTaskRepository implements TaskRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return uuid;
     }
 
     @Override
-    public void deleteTask(String date, int hours, int minutes) {
-        String sql = "DELETE FROM USERS WHERE DATE = ? AND HOURS = ? AND MINUTES = ?";
+    public void deleteTask(String uuid) {
+        String sql = "DELETE FROM USERS WHERE UUID = ?";
         try (Connection conn = DriverManager.getConnection(DBConfig.URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, date);
-            pstmt.setInt(2, hours);
-            pstmt.setInt(3, minutes);
+            pstmt.setString(1, uuid);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void replaceUuid(String localUuid, String remoteUuid) {
+        String sql = "UPDATE USERS SET UUID = ? WHERE UUID = ?";
+        try (Connection conn = DriverManager.getConnection(DBConfig.URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, remoteUuid);
+            pstmt.setString(2, localUuid);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("[SQLiteTaskRepository] replaceUuid error: " + e.getMessage());
         }
     }
 

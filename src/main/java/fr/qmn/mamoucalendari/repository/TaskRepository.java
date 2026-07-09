@@ -9,6 +9,6 @@ public interface TaskRepository {
     List<Tasks> getTasksByDate(String date);
     Tasks[] getClosestTaskByTime(String date, int hours, int minutes);
     void createTask(String date, int hours, int minutes, String tasks, boolean isDone);
-    void deleteTask(String date, int hours, int minutes);
+    void deleteTask(String uuid);
     void markTaskDone(String uuid);
 }
