@@ -1,0 +1,10 @@
+# Copier ce fichier en "app.properties" à côté du JAR sur le Raspberry Pi et remplir les valeurs.
+# En mode sqlite : api.url et api.key sont ignorés.
+#
+# Modes disponibles : sqlite | remote | sync
+#   sqlite → tout en local, pas de réseau
+#   remote → lecture/écriture via l'API uniquement
+#   sync   → écriture locale + synchronisation asynchrone vers l'API
+repository.mode=sqlite
+api.url=http://mon-serveur:8000
+api.key=VOTRE_CLE_ICI
