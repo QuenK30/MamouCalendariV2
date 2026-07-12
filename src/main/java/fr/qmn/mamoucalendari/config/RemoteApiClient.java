@@ -8,19 +8,26 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.function.Supplier;
 
 public class RemoteApiClient {
 
-    private final String baseUrl;
-    private final String apiKey;
-    private final HttpClient http;
-    private final ObjectMapper mapper;
+    private final String           baseUrl;
+    private final String           apiKey;
+    private final HttpClient       http;
+    private final ObjectMapper     mapper;
+    private final Supplier<String> bearerToken;
+
+    public RemoteApiClient(String baseUrl, String apiKey, Supplier<String> bearerToken) {
+        this.baseUrl     = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+        this.apiKey      = apiKey;
+        this.bearerToken = bearerToken;
+        this.http        = HttpClient.newHttpClient();
+        this.mapper      = new ObjectMapper();
+    }
 
     public RemoteApiClient(String baseUrl, String apiKey) {
-        this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
-        this.apiKey  = apiKey;
-        this.http    = HttpClient.newHttpClient();
-        this.mapper  = new ObjectMapper();
+        this(baseUrl, apiKey, null);
     }
 
     public <T> T get(String path, Class<T> type) {
@@ -63,11 +70,15 @@ public class RemoteApiClient {
 
     private HttpRequest.Builder builder(String path) {
         String url = baseUrl + (path.startsWith("/") ? path : "/" + path);
-        return HttpRequest.newBuilder()
+        HttpRequest.Builder b = HttpRequest.newBuilder()
             .uri(URI.create(url))
             .header("X-API-Key", apiKey)
             .header("Content-Type", "application/ld+json")
             .header("Accept", "application/ld+json");
+        if (bearerToken != null) {
+            b.header("Authorization", "Bearer " + bearerToken.get());
+        }
+        return b;
     }
 
     private HttpRequest.BodyPublisher jsonBody(Object payload) {

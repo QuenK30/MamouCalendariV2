@@ -3,7 +3,6 @@ package fr.qmn.mamoucalendari;
 import fr.qmn.mamoucalendari.bdd.SQLInit;
 import fr.qmn.mamoucalendari.bdd.ScreenConfigManager;
 import fr.qmn.mamoucalendari.config.AppConfig;
-import fr.qmn.mamoucalendari.config.AuthException;
 import fr.qmn.mamoucalendari.config.RemoteApiClient;
 import fr.qmn.mamoucalendari.controller.calendar.CalendarController;
 import fr.qmn.mamoucalendari.controller.visual.VisualController;
@@ -11,6 +10,7 @@ import fr.qmn.mamoucalendari.repository.SQLiteTaskRepository;
 import fr.qmn.mamoucalendari.repository.SyncQueue;
 import fr.qmn.mamoucalendari.service.AuthService;
 import fr.qmn.mamoucalendari.service.SyncWorker;
+import fr.qmn.mamoucalendari.service.TokenManager;
 import fr.qmn.mamoucalendari.tasks.TasksReminder;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -27,21 +27,38 @@ public class MCMain extends Application {
     public static volatile VisualController   activeVisualController   = null;
     public static volatile CalendarController activeCalendarController = null;
 
-    public static AuthService authService = null;
+    public static TokenManager tokenManager = null;
 
     private static TasksReminder tasksReminder;
     private static SyncWorker    syncWorker;
 
     @Override
     public void start(Stage ignored) throws IOException {
-        if (!ScreenConfigManager.isConfigured()) {
+        if (tokenManager != null && !tokenManager.hasValidToken()) {
+            showLoginScreen();
+        } else if (!ScreenConfigManager.isConfigured()) {
             showSetupWizard();
         } else {
             openMainWindows();
         }
     }
 
-    private void showSetupWizard() throws IOException {
+    private void showLoginScreen() throws IOException {
+        FXMLLoader loader = new FXMLLoader(MCMain.class.getResource(
+            "/fr/qmn/mamoucalendari/design/LoginScreen.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(MCMain.class.getResource(
+            "/fr/qmn/mamoucalendari/css/login.css").toExternalForm());
+        Stage stage = new Stage();
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.setScene(scene);
+        ScreenConfigManager.applyScreen(stage, root, 0);
+        stage.setAlwaysOnTop(true);
+        stage.show();
+    }
+
+    public static void showSetupWizard() throws IOException {
         FXMLLoader loader = new FXMLLoader(MCMain.class.getResource(
             "/fr/qmn/mamoucalendari/design/SetupScreen.fxml"));
         Parent root = loader.load();
@@ -51,6 +68,20 @@ public class MCMain extends Application {
         ScreenConfigManager.applyScreen(setup, root, 0);
         setup.setAlwaysOnTop(true);
         setup.show();
+    }
+
+    public static void continueStartup() {
+        Platform.runLater(() -> {
+            try {
+                if (!ScreenConfigManager.isConfigured()) {
+                    showSetupWizard();
+                } else {
+                    openMainWindows();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public static void openMainWindows() {
@@ -97,23 +128,24 @@ public class MCMain extends Application {
     public static void main(String[] args) {
         new SQLInit().createNewDatabase();
         if (!AppConfig.getMode().equals("sqlite")) {
-            authService = new AuthService(
+            AuthService authService = new AuthService(
                 AppConfig.getApiUrl(),
                 AppConfig.getApiUsername(),
                 AppConfig.getApiPassword()
             );
-            try {
-                authService.login();
-            } catch (AuthException e) {
-                System.out.println("[MCMain] Auth warning: " + e.getMessage());
-            }
+            tokenManager = new TokenManager(authService);
+            tokenManager.ensureAuthenticated();
         }
         tasksReminder = new TasksReminder();
         tasksReminder.startReminder();
         if (AppConfig.getMode().equals("sync")) {
             syncWorker = new SyncWorker(
                 new SyncQueue(),
-                new RemoteApiClient(AppConfig.getApiUrl(), AppConfig.getApiKey()),
+                new RemoteApiClient(
+                    AppConfig.getApiUrl(),
+                    AppConfig.getApiKey(),
+                    tokenManager != null ? tokenManager::getAccessToken : null
+                ),
                 new SQLiteTaskRepository()
             );
             syncWorker.start();

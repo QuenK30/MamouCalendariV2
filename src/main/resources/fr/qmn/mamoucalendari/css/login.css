@@ -1,0 +1,31 @@
+@font-face {
+    font-family: 'Ubuntu';
+    src: url('../font/Ubuntu-Bold.ttf');
+}
+
+#emailField, #passwordField {
+    -fx-font-size: 28px;
+    -fx-font-family: 'Ubuntu';
+    -fx-pref-width: 600px;
+    -fx-pref-height: 70px;
+}
+
+#loginButton {
+    -fx-font-size: 30px;
+    -fx-font-family: 'Ubuntu';
+    -fx-background-color: #00cc66;
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-pref-width: 320px;
+    -fx-pref-height: 80px;
+}
+
+#loginButton:disabled {
+    -fx-opacity: 0.5;
+}
+
+#errorLabel {
+    -fx-font-size: 24px;
+    -fx-text-fill: #cc0000;
+    -fx-font-family: 'Ubuntu';
+}
