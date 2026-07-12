@@ -54,6 +54,16 @@ public class SQLInit {
                         "CREATED_AT TEXT    NOT NULL)");
                 }
             }
+            if (!doesTableIsCreate(connection, "AUTH_TOKENS")) {
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate(
+                        "CREATE TABLE AUTH_TOKENS(" +
+                        "ID            INTEGER PRIMARY KEY," +
+                        "ACCESS_TOKEN  TEXT," +
+                        "REFRESH_TOKEN TEXT," +
+                        "EXPIRES_AT    TEXT)");
+                }
+            }
         } catch (Exception e) {
             System.out.println("Error: When creating db");
             e.printStackTrace();

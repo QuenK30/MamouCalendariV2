@@ -8,3 +8,5 @@
 repository.mode=sqlite
 api.url=http://mon-serveur:8000
 api.key=VOTRE_CLE_ICI
+api.username=user@example.com
+api.password=VOTRE_MOT_DE_PASSE

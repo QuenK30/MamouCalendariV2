@@ -12,6 +12,8 @@ public class AppConfig {
     private static final String mode;
     private static final String apiUrl;
     private static final String apiKey;
+    private static final String apiUsername;
+    private static final String apiPassword;
 
     static {
         Properties props = new Properties();
@@ -38,9 +40,11 @@ public class AppConfig {
             }
         }
 
-        mode   = props.getProperty("repository.mode", "sqlite").trim();
-        apiUrl = props.getProperty("api.url",         "").trim();
-        apiKey = props.getProperty("api.key",         "").trim();
+        mode        = props.getProperty("repository.mode", "sqlite").trim();
+        apiUrl      = props.getProperty("api.url",         "").trim();
+        apiKey      = props.getProperty("api.key",         "").trim();
+        apiUsername = props.getProperty("api.username",    "").trim();
+        apiPassword = props.getProperty("api.password",    "").trim();
 
         if (!mode.equals("sqlite") && !mode.equals("remote") && !mode.equals("sync")) {
             throw new RuntimeException("repository.mode invalide : '" + mode + "' (valeurs acceptées : sqlite, remote, sync)");
@@ -50,7 +54,9 @@ public class AppConfig {
         System.out.println("[AppConfig] mode=" + mode + (hasNetwork ? " url=" + apiUrl : ""));
     }
 
-    public static String getMode()   { return mode; }
-    public static String getApiUrl() { return apiUrl; }
-    public static String getApiKey() { return apiKey; }
+    public static String getMode()        { return mode; }
+    public static String getApiUrl()      { return apiUrl; }
+    public static String getApiKey()      { return apiKey; }
+    public static String getApiUsername() { return apiUsername; }
+    public static String getApiPassword() { return apiPassword; }
 }

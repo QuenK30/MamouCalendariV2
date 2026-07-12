@@ -151,7 +151,7 @@ public class OCRController {
         title.setAlignment(Pos.CENTER);
         title.setMaxWidth(Double.MAX_VALUE);
 
-        String[] categories = {"Médical", "Administratif", "Famille", "Loisir"};
+        String[] categories = {"Médical", "Famille", "Loisir"};
 
         GridPane grid = new GridPane();
         grid.setHgap(40);

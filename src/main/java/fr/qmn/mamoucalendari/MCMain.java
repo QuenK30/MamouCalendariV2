@@ -3,11 +3,13 @@ package fr.qmn.mamoucalendari;
 import fr.qmn.mamoucalendari.bdd.SQLInit;
 import fr.qmn.mamoucalendari.bdd.ScreenConfigManager;
 import fr.qmn.mamoucalendari.config.AppConfig;
+import fr.qmn.mamoucalendari.config.AuthException;
 import fr.qmn.mamoucalendari.config.RemoteApiClient;
 import fr.qmn.mamoucalendari.controller.calendar.CalendarController;
 import fr.qmn.mamoucalendari.controller.visual.VisualController;
 import fr.qmn.mamoucalendari.repository.SQLiteTaskRepository;
 import fr.qmn.mamoucalendari.repository.SyncQueue;
+import fr.qmn.mamoucalendari.service.AuthService;
 import fr.qmn.mamoucalendari.service.SyncWorker;
 import fr.qmn.mamoucalendari.tasks.TasksReminder;
 import javafx.application.Application;
@@ -24,6 +26,8 @@ public class MCMain extends Application {
 
     public static volatile VisualController   activeVisualController   = null;
     public static volatile CalendarController activeCalendarController = null;
+
+    public static AuthService authService = null;
 
     private static TasksReminder tasksReminder;
     private static SyncWorker    syncWorker;
@@ -92,6 +96,18 @@ public class MCMain extends Application {
 
     public static void main(String[] args) {
         new SQLInit().createNewDatabase();
+        if (!AppConfig.getMode().equals("sqlite")) {
+            authService = new AuthService(
+                AppConfig.getApiUrl(),
+                AppConfig.getApiUsername(),
+                AppConfig.getApiPassword()
+            );
+            try {
+                authService.login();
+            } catch (AuthException e) {
+                System.out.println("[MCMain] Auth warning: " + e.getMessage());
+            }
+        }
         tasksReminder = new TasksReminder();
         tasksReminder.startReminder();
         if (AppConfig.getMode().equals("sync")) {

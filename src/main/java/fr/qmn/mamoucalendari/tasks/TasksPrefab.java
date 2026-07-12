@@ -2,29 +2,17 @@ package fr.qmn.mamoucalendari.tasks;
 
 public enum TasksPrefab {
     MEDICAL(
-            "Rendez-vous médical",
-            "Examen dentaire",
-            "Examen ophtalmologique",
-            "Examen radiologique",
-            "Examen Divers"),
-    ADMINISTRATIVE(
-            "Rendez-vous administratif",
-            "Allez à la banque",
-            "Rendez-vous juridique",
-            "Rendez-vous avec un avocat",
-            "Rendez-vous avec un conseiller bancaire"),
+            "Rendez-vous chez le médecin",
+            "Rendez-vous chez le kiné",
+            "Prise de sang",
+            "Rendez-vous chez le cardiologue",
+            "Aller à la pharmacie"),
     FAMILY(
-            "Repas de famille",
-            "Anniversaire",
-            "Mariage",
-            "Baptême",
-            "Cérémonie"),
+            "Visite de la famille",
+            "Repas de famille"),
     FUN(
-            "Sortie entre amis",
-            "Cinéma",
-            "Théâtre",
-            "Sophrologie",
-            "Couture");
+            "Amis du bon vieux temps",
+            "Loto");
     private final String[] tasks;
 
     TasksPrefab(String... tasks) {
@@ -39,7 +27,6 @@ public enum TasksPrefab {
     public static String[] getTasksByCategory(String category) {
         return switch (category) {
             case "Médical" -> MEDICAL.getTasks();
-            case "Administratif" -> ADMINISTRATIVE.getTasks();
             case "Famille" -> FAMILY.getTasks();
             case "Loisir" -> FUN.getTasks();
             default -> new String[0];
