@@ -42,10 +42,9 @@ public class TasksReminder {
         scheduler.shutdownNow();
     }
 
-    public void startReminder() {
+    public void startReminder(int intervalMinutes) {
         scheduler.scheduleAtFixedRate(() -> {
             try {
-                // Réinitialise les rappels envoyés au changement de jour
                 String today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
                 if (!today.equals(lastCheckedDate)) {
                     sentReminders.clear();
@@ -58,7 +57,7 @@ public class TasksReminder {
                 System.out.println("Error: When checking reminder");
                 e.printStackTrace();
             }
-        }, 0, 1, TimeUnit.MINUTES);
+        }, 0, intervalMinutes, TimeUnit.MINUTES);
     }
 
     public void loadTasksFromDB() {

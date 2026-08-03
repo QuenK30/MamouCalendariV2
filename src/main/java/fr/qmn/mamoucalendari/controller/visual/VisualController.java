@@ -1,6 +1,7 @@
 package fr.qmn.mamoucalendari.controller.visual;
 
 import fr.qmn.mamoucalendari.MCMain;
+import fr.qmn.mamoucalendari.service.TaskChangeNotifier;
 import fr.qmn.mamoucalendari.service.TaskService;
 import fr.qmn.mamoucalendari.tasks.Tasks;
 import fr.qmn.mamoucalendari.utils.StringLib;
@@ -47,6 +48,10 @@ public class VisualController {
         );
         taskTimeline.setCycleCount(Timeline.INDEFINITE);
         taskTimeline.play();
+
+        TaskChangeNotifier.getInstance().lastChangedProperty().addListener(
+            (obs, oldVal, newVal) -> { updateDate(); setTasks(); }
+        );
     }
 
     private void updateDate() {

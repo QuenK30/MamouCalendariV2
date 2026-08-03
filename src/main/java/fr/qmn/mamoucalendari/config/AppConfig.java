@@ -14,6 +14,9 @@ public class AppConfig {
     private static final String apiKey;
     private static final String apiUsername;
     private static final String apiPassword;
+    private static final int    syncPushInterval;
+    private static final int    syncPullInterval;
+    private static final int    reminderInterval;
 
     static {
         Properties props = new Properties();
@@ -40,11 +43,14 @@ public class AppConfig {
             }
         }
 
-        mode        = props.getProperty("repository.mode", "sqlite").trim();
-        apiUrl      = props.getProperty("api.url",         "").trim();
-        apiKey      = props.getProperty("api.key",         "").trim();
-        apiUsername = props.getProperty("api.username",    "").trim();
-        apiPassword = props.getProperty("api.password",    "").trim();
+        mode             = props.getProperty("repository.mode",                   "sqlite").trim();
+        apiUrl           = props.getProperty("api.url",                           "").trim();
+        apiKey           = props.getProperty("api.key",                           "").trim();
+        apiUsername      = props.getProperty("api.username",                      "").trim();
+        apiPassword      = props.getProperty("api.password",                      "").trim();
+        syncPushInterval = Integer.parseInt(props.getProperty("sync.push.interval.seconds",        "30").trim());
+        syncPullInterval = Integer.parseInt(props.getProperty("sync.pull.interval.seconds",       "300").trim());
+        reminderInterval = Integer.parseInt(props.getProperty("reminder.check.interval.minutes",    "1").trim());
 
         if (!mode.equals("sqlite") && !mode.equals("remote") && !mode.equals("sync")) {
             throw new RuntimeException("repository.mode invalide : '" + mode + "' (valeurs acceptées : sqlite, remote, sync)");
@@ -54,9 +60,12 @@ public class AppConfig {
         System.out.println("[AppConfig] mode=" + mode + (hasNetwork ? " url=" + apiUrl : ""));
     }
 
-    public static String getMode()        { return mode; }
-    public static String getApiUrl()      { return apiUrl; }
-    public static String getApiKey()      { return apiKey; }
-    public static String getApiUsername() { return apiUsername; }
-    public static String getApiPassword() { return apiPassword; }
+    public static String getMode()              { return mode; }
+    public static String getApiUrl()            { return apiUrl; }
+    public static String getApiKey()            { return apiKey; }
+    public static String getApiUsername()       { return apiUsername; }
+    public static String getApiPassword()       { return apiPassword; }
+    public static int    getSyncPushInterval()  { return syncPushInterval; }
+    public static int    getSyncPullInterval()  { return syncPullInterval; }
+    public static int    getReminderInterval()  { return reminderInterval; }
 }

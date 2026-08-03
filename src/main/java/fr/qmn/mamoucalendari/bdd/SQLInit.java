@@ -23,7 +23,7 @@ public class SQLInit {
                         "MINUTES INTEGER NOT NULL," +
                         "TASKS TEXT NOT NULL," +
                         "ISDONE BOOLEAN NOT NULL," +
-                        "UUID TEXT," +
+                        "UUID TEXT UNIQUE," +
                         "CREATED_AT TEXT," +
                         "UPDATED_AT TEXT)");
                 }
@@ -75,6 +75,31 @@ public class SQLInit {
         addColumnIfMissing(connection, "CREATED_AT", "TEXT");
         addColumnIfMissing(connection, "UPDATED_AT", "TEXT");
         backfillMissingUuids(connection);
+        deduplicateByUuid(connection);
+        createUuidUniqueIndex(connection);
+    }
+
+    private void deduplicateByUuid(Connection connection) {
+        String sql =
+            "DELETE FROM USERS WHERE ID NOT IN (" +
+            "  SELECT MIN(ID) FROM USERS WHERE UUID IS NOT NULL GROUP BY UUID" +
+            ") AND UUID IS NOT NULL";
+        try (Statement stmt = connection.createStatement()) {
+            int deleted = stmt.executeUpdate(sql);
+            if (deleted > 0)
+                System.out.println("| Migration : " + deleted + " doublon(s) UUID supprimé(s)          |");
+        } catch (SQLException e) {
+            System.out.println("Error: deduplicateByUuid — " + e.getMessage());
+        }
+    }
+
+    private void createUuidUniqueIndex(Connection connection) {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate(
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_users_uuid ON USERS(UUID)");
+        } catch (SQLException e) {
+            System.out.println("Error: createUuidUniqueIndex — " + e.getMessage());
+        }
     }
 
     private void addColumnIfMissing(Connection connection, String column, String type) {

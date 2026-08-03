@@ -1,5 +1,6 @@
 package fr.qmn.mamoucalendari.repository;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.qmn.mamoucalendari.config.RemoteApiClient;
@@ -96,6 +97,7 @@ public class RemoteTaskRepository implements TaskRepository {
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class HydraCollection {
         @JsonProperty("hydra:member")
+        @JsonAlias("member")
         public List<TaskDto> member;
     }
 
@@ -106,6 +108,7 @@ public class RemoteTaskRepository implements TaskRepository {
         public String  date;
         public int     hours;
         public int     minutes;
+        @JsonProperty("task")
         public String  tasks;
         public boolean isDone;
         public String  createdAt;

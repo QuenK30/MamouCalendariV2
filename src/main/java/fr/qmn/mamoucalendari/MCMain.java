@@ -137,7 +137,7 @@ public class MCMain extends Application {
             tokenManager.ensureAuthenticated();
         }
         tasksReminder = new TasksReminder();
-        tasksReminder.startReminder();
+        tasksReminder.startReminder(AppConfig.getReminderInterval());
         if (AppConfig.getMode().equals("sync")) {
             syncWorker = new SyncWorker(
                 new SyncQueue(),
@@ -148,7 +148,7 @@ public class MCMain extends Application {
                 ),
                 new SQLiteTaskRepository()
             );
-            syncWorker.start();
+            syncWorker.start(AppConfig.getSyncPushInterval(), AppConfig.getSyncPullInterval());
         }
         launch();
     }

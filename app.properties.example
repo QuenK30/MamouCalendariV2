@@ -1,5 +1,4 @@
 # Copier ce fichier en "app.properties" à côté du JAR sur le Raspberry Pi et remplir les valeurs.
-# En mode sqlite : api.url et api.key sont ignorés.
 #
 # Modes disponibles : sqlite | remote | sync
 #   sqlite → tout en local, pas de réseau
@@ -10,3 +9,15 @@ api.url=http://mon-serveur:8000
 api.key=VOTRE_CLE_ICI
 api.username=user@example.com
 api.password=VOTRE_MOT_DE_PASSE
+
+# --- Synchronisation (modes remote et sync uniquement) ---
+# Fréquence d'envoi des opérations en attente vers l'API (CREATE/DELETE/MARK_DONE)
+sync.push.interval.seconds=30
+# Fréquence de récupération des tâches depuis l'API vers SQLite local
+# Permet de voir les tâches créées directement via l'API sans passer par l'appli
+sync.pull.interval.seconds=300
+
+# --- Rappels ---
+# Fréquence à laquelle l'appli vérifie s'il faut envoyer un rappel (en minutes)
+# Les rappels se déclenchent à 60, 30, 15, 5 et 0 minutes avant la tâche
+reminder.check.interval.minutes=1

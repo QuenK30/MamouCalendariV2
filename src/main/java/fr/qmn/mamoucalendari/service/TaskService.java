@@ -32,13 +32,16 @@ public class TaskService {
 
     public void createTask(String date, int hours, int minutes, String tasks, boolean isDone) {
         repository.createTask(date, hours, minutes, tasks, isDone);
+        TaskChangeNotifier.getInstance().notifyChange();
     }
 
     public void deleteTask(String uuid) {
         repository.deleteTask(uuid);
+        TaskChangeNotifier.getInstance().notifyChange();
     }
 
     public void markTaskDone(String uuid) {
         repository.markTaskDone(uuid);
+        TaskChangeNotifier.getInstance().notifyChange();
     }
 }

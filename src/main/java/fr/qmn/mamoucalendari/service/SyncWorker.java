@@ -1,6 +1,8 @@
 package fr.qmn.mamoucalendari.service;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.qmn.mamoucalendari.config.RemoteApiClient;
@@ -8,7 +10,9 @@ import fr.qmn.mamoucalendari.config.RemoteApiException;
 import fr.qmn.mamoucalendari.repository.SQLiteTaskRepository;
 import fr.qmn.mamoucalendari.repository.SyncQueue;
 import fr.qmn.mamoucalendari.repository.SyncQueue.SyncEntry;
+import fr.qmn.mamoucalendari.tasks.Tasks;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -32,8 +36,9 @@ public class SyncWorker {
         this.localRepo = localRepo;
     }
 
-    public void start() {
-        scheduler.scheduleAtFixedRate(this::sync, 0, 30, TimeUnit.SECONDS);
+    public void start(int pushIntervalSeconds, int pullIntervalSeconds) {
+        scheduler.scheduleAtFixedRate(this::sync, 0, pushIntervalSeconds, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this::pull, 0, pullIntervalSeconds, TimeUnit.SECONDS);
     }
 
     public void shutdown() {
@@ -41,10 +46,12 @@ public class SyncWorker {
     }
 
     private void sync() {
+        boolean anySuccess = false;
         for (SyncEntry entry : queue.getPending()) {
             try {
                 dispatch(entry);
                 queue.markDone(entry.id());
+                anySuccess = true;
                 System.out.println("[SyncWorker] OK  " + entry.operation() + " id=" + entry.id());
             } catch (RemoteApiException e) {
                 queue.markFailed(entry.id());
@@ -54,6 +61,7 @@ public class SyncWorker {
                 System.out.println("[SyncWorker] ERR " + entry.operation() + " id=" + entry.id() + " → " + e.getMessage());
             }
         }
+        if (anySuccess) pull();
     }
 
     @SuppressWarnings("unchecked")
@@ -91,8 +99,58 @@ public class SyncWorker {
         }
     }
 
+    private void pull() {
+        try {
+            HydraCollection col = client.get("/api/tasks?itemsPerPage=1000", HydraCollection.class);
+            if (col.member == null) return;
+            int count = 0;
+            for (TaskDto dto : col.member) {
+                String date      = stripTime(dto.date);
+                String createdAt = stripTime(dto.createdAt);
+                String updatedAt = stripTime(dto.updatedAt);
+                Tasks t = new Tasks(dto.id, dto.uuid, date, dto.hours,
+                                    dto.minutes, dto.tasks, dto.isDone,
+                                    createdAt, updatedAt);
+                if (localRepo.upsertFromRemote(t)) count++;
+            }
+            if (count > 0) {
+                System.out.println("[SyncWorker] PULL : " + count + " tâche(s) importée(s)");
+                TaskChangeNotifier.getInstance().notifyChange();
+            }
+        } catch (Exception e) {
+            System.out.println("[SyncWorker] PULL erreur : " + e.getMessage());
+        }
+    }
+
+    private static String stripTime(String iso) {
+        if (iso == null) return null;
+        int t = iso.indexOf('T');
+        return t > 0 ? iso.substring(0, t) : iso;
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class TaskCreatedResponse {
         public String uuid;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class HydraCollection {
+        @JsonProperty("hydra:member")
+        @JsonAlias("member")
+        public List<TaskDto> member;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class TaskDto {
+        public int     id;
+        public String  uuid;
+        public String  date;
+        public int     hours;
+        public int     minutes;
+        @JsonProperty("task")
+        public String  tasks;
+        public boolean isDone;
+        public String  createdAt;
+        public String  updatedAt;
     }
 }

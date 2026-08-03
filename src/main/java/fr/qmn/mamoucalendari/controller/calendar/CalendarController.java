@@ -3,6 +3,7 @@ package fr.qmn.mamoucalendari.controller.calendar;
 import fr.qmn.mamoucalendari.MCMain;
 import fr.qmn.mamoucalendari.bdd.ScreenConfigManager;
 import fr.qmn.mamoucalendari.controller.tact.OCRController;
+import fr.qmn.mamoucalendari.service.TaskChangeNotifier;
 import fr.qmn.mamoucalendari.service.TaskService;
 import fr.qmn.mamoucalendari.tasks.Tasks;
 import fr.qmn.mamoucalendari.utils.TimeLib;
@@ -59,6 +60,10 @@ public class CalendarController {
     private HBox luOverlay  = null;
     private VBox dayOverlay = null;
 
+    private String  overlayDate    = null;
+    private boolean overlayIsPast  = false;
+    private VBox    overlayTaskBox = null;
+
     private final TaskService taskService = new TaskService();
 
     public void initialize() {
@@ -71,6 +76,15 @@ public class CalendarController {
         setActionOnMonthButtons();
         calendar.getStylesheets().add(
             getClass().getResource("/fr/qmn/mamoucalendari/css/calendar.css").toExternalForm());
+
+        TaskChangeNotifier.getInstance().lastChangedProperty().addListener(
+            (obs, oldVal, newVal) -> {
+                if (MCMain.activeCalendarController != this) return;
+                if (dayOverlay != null && overlayDate != null && overlayTaskBox != null) {
+                    refreshTaskList(overlayTaskBox, overlayDate, overlayIsPast);
+                }
+            }
+        );
     }
 
     public void setTextDays() {
@@ -237,6 +251,9 @@ public class CalendarController {
         title.setStyle("-fx-font-size: 34px; -fx-font-weight: bold; -fx-text-fill: black;");
 
         VBox taskList = new VBox(12);
+        this.overlayDate    = convertDate;
+        this.overlayIsPast  = isPast;
+        this.overlayTaskBox = taskList;
         refreshTaskList(taskList, convertDate, isPast);
 
         ScrollPane scroll = new ScrollPane(taskList);
@@ -359,6 +376,8 @@ public class CalendarController {
     }
 
     private void hideDayOverlay() {
+        this.overlayDate    = null;
+        this.overlayTaskBox = null;
         if (dayOverlay != null) {
             calendar.getChildren().remove(dayOverlay);
             dayOverlay = null;

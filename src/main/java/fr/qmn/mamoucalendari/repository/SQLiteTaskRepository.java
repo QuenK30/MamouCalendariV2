@@ -101,6 +101,27 @@ public class SQLiteTaskRepository implements TaskRepository {
         }
     }
 
+    public boolean upsertFromRemote(Tasks task) {
+        String sql =
+            "INSERT OR IGNORE INTO USERS " +
+            "(DATE, HOURS, MINUTES, TASKS, ISDONE, UUID, CREATED_AT, UPDATED_AT) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DriverManager.getConnection(DBConfig.URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1,  task.getDate());
+            pstmt.setInt(2,     task.getHours());
+            pstmt.setInt(3,     task.getMinutes());
+            pstmt.setString(4,  task.getTasks());
+            pstmt.setBoolean(5, task.getIsDone());
+            pstmt.setString(6,  task.getUuid());
+            pstmt.setString(7,  task.getCreatedAt());
+            pstmt.setString(8,  task.getUpdatedAt());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void replaceUuid(String localUuid, String remoteUuid) {
         String sql = "UPDATE USERS SET UUID = ? WHERE UUID = ?";
         try (Connection conn = DriverManager.getConnection(DBConfig.URL);
